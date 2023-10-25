@@ -1,0 +1,23 @@
+version: "3.7"
+services:
+  flask_app:
+    build: './flask_app'
+    
+    ports:
+      - "5000:5000"
+    depends_on:
+      - redis
+
+  simple_worker:
+    build: './simple_worker'
+    depends_on:
+      - redis
+      - flask_app
+  
+
+  redis:
+    image: 'redis:4-alpine'
+    ports:
+      - '6379:6379'
+    environment:
+      - name=value

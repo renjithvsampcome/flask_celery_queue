@@ -1,0 +1,11 @@
+Flask
+celery[redis]
+boto3
+Flask
+pandas
+python-dotenv
+Requests
+SQLAlchemy
+psycopg2-binary
+pangres
+tweepy
