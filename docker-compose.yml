@@ -2,7 +2,19 @@ version: "3.7"
 services:
   flask_app:
     build: './flask_app'
-    
+    environment:
+      - REDIS_URL=${REDIS_URL}
+      - REDIS_PORT=${REDIS_PORT}
+      - MONGODB_HOST=${MONGODB_HOST}
+      - MONGODB_PORT=${MONGODB_PORT}
+      - CLIENT_ID_DEV=${CLIENT_ID_DEV}
+      - CLINET_SECERET_DEV=${CLINET_SECERET_DEV}
+      - REDIRECT_URI_DEV=${REDIRECT_URI_DEV}
+      - DB_CONNECTION_STRING=${DB_CONNECTION_STRING}
+      - TWITTER_CONSUMER_KEY=${TWITTER_CONSUMER_KEY}
+      - TWITTER_CONSUMER_SECRET=${TWITTER_CONSUMER_SECRET}
+      - TWITTER_CALLBACK=${TWITTER_CALLBACK}
+
     ports:
       - "5000:5000"
     depends_on:
@@ -13,7 +25,11 @@ services:
     depends_on:
       - redis
       - flask_app
-  
+    environment:
+      - BUCKET_ENDPOINT=${BUCKET_ENDPOINT}
+      - BUCKET_ACCESS=${BUCKET_ACCESS}
+      - BUCKET_SECRET=${BUCKET_SECRET}
+      - BUCKET_NAME=${BUCKET_NAME}
 
   redis:
     image: 'redis:4-alpine'
