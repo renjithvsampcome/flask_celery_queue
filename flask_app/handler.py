@@ -77,7 +77,7 @@ def handle_api_insta(row,response, token):
                 file_url = give_file_name(d['id'], d['media_type'])
                 if file_url:
                     r = simple_app.send_task('tasks.handle_file', kwargs={'url': d['media_url'], 'name': d['id'], 'type': d['media_type']})
-                    row.append((f"{d['id']}_{count}",d["media_type"],file_url ,d["username"],d['timestamp'],True,caption))  
+                    row.append((f"{d['id']}{count}",d["media_type"],file_url ,d["username"],d['timestamp'],True,caption))  
                     count+=1
         else:
             pass
