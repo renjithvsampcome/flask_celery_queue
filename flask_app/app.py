@@ -86,7 +86,7 @@ def import_instagram(code,id):
             df = pd.DataFrame(row, columns=['file_id', 'media_type', 'media_url',"username","timestamp","is_album","caption"])
             df['user_id'] = id
             #save it to db
-            app.logger.info(df)
+            df = df.drop_duplicates(subset=['file_id'])
             pg.upsert(
                 con=engine,
                 df=df.set_index('file_id'),
