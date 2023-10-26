@@ -75,7 +75,7 @@ def import_instagram(code,id):
             while next_url:
                 res = requests.get(next_url).json()
                 if len(res['data'])!= 0:
-                    result = handle_api_insta(row,response,token)
+                    result = handle_api_insta(row,res,token)
                     if result is not None:
                         last_file_id = result
 
@@ -86,7 +86,6 @@ def import_instagram(code,id):
             df = pd.DataFrame(row, columns=['file_id', 'media_type', 'media_url',"username","timestamp","is_album","caption"])
             df['user_id'] = id
             #save it to db
-            df = df.drop_duplicates(subset=['file_id'])
             pg.upsert(
                 con=engine,
                 df=df.set_index('file_id'),
