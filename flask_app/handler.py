@@ -72,6 +72,8 @@ def handle_api_insta(row,response, token):
                 'access_token': token['access_token']
             }
             res = requests.get(f"https://graph.instagram.com/{data['id']}/children", params=params).json()
+            logger.info(res)
+
             count=0
             for d in res['data']:
                 file_url = give_file_name(d['id'], d['media_type'])
