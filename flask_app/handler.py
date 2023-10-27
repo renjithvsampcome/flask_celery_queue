@@ -124,7 +124,10 @@ oauth1_user_handler = tweepy.OAuth1UserHandler(
 )
 
 def get_access_url():
-    return oauth1_user_handler.get_authorization_url(signin_with_twitter=True)
+    try:
+        return jsonify({'result': f"{oauth1_user_handler.get_authorization_url(signin_with_twitter=True)}"}) , 200
+    except Exception as e:
+        return jsonify({'error': f"{e}"}), 400
 
 def handle_twitter_api(row, code):
     try:
