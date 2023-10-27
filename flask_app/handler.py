@@ -154,7 +154,7 @@ def handle_twitter_api(row, code):
                     row.append((data.media_key, data.type, file_url, user.data.username))
             else:
                 pass
-        return row , r
+        return row , r.id
     except Exception as e:
         logger.info(f"Encounter an exception: {e}")
         return  [] , None
