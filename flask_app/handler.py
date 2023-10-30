@@ -61,7 +61,7 @@ def handle_api_insta(row,response, token,idd):
         if data['media_type'] == 'VIDEO' or data['media_type'] == 'IMAGE':
             file_url = give_file_name(f"{data['id']}{idd}", data['media_type'])
             if file_url:
-                r = simple_app.send_task('tasks.handle_file', kwargs={'url': data['media_url'], 'name': data['id'], 'type': data['media_type']})
+                r = simple_app.send_task('tasks.handle_file', kwargs={'url': data['media_url'], 'name': f"{data['id']}{idd}", 'type': data['media_type']})
                 # file_url = handle_file(data['media_url'], data['id'], data['media_type'])
                 row.append((f"{data['id']}{idd}", data["media_type"],file_url ,data["username"],data['timestamp'],False, caption))
                 
@@ -73,9 +73,9 @@ def handle_api_insta(row,response, token,idd):
             res = requests.get(f"https://graph.instagram.com/{data['id']}/children", params=params).json()
             count=0
             for d in res['data']:
-                file_url = give_file_name(f"{data['id']}{idd}{count}", d['media_type'])
+                file_url = give_file_name(f"{d['id']}{idd}{count}", d['media_type'])
                 if file_url:
-                    r = simple_app.send_task('tasks.handle_file', kwargs={'url': d['media_url'], 'name': d['id'], 'type': d['media_type']})
+                    r = simple_app.send_task('tasks.handle_file', kwargs={'url': d['media_url'], 'name': f"{d['id']}{idd}{count}", 'type': d['media_type']})
                     row.append((f"{data['id']}{idd}{count}",d["media_type"],file_url ,d["username"],d['timestamp'],True,caption))  
                     count+=1
         else:
@@ -95,7 +95,7 @@ def handle_api_facebook(row,response,idd):
                 data['type'] = "IMAGE"
                 file_url = give_file_name(f"{data['id']}{idd}", data['type'])
                 if file_url:
-                    r = simple_app.send_task('tasks.handle_file', kwargs={'url': data['full_picture'], 'name': data['id'], 'type': data['type'] })
+                    r = simple_app.send_task('tasks.handle_file', kwargs={'url': data['full_picture'], 'name': f"{data['id']}{idd}", 'type': data['type'] })
                     row.append((f"{data['id']}{idd}", "IMAGE", file_url ,"username",data['created_time'],False, message))
                 
             elif data['type'] == "video":
@@ -103,7 +103,7 @@ def handle_api_facebook(row,response,idd):
                 if 'source' in data['attachments']['data'][0]['media']:
                     file_url = give_file_name(f"{data['id']}{idd}", data['type'] )
                     if file_url:
-                        r = simple_app.send_task('tasks.handle_file', kwargs={'url': data['attachments']['data'][0]['media']['source'], 'name': data['id'], 'type': data['type'] })
+                        r = simple_app.send_task('tasks.handle_file', kwargs={'url': data['attachments']['data'][0]['media']['source'], 'name': f"{data['id']}{idd}", 'type': data['type'] })
                         row.append((f"{data['id']}{idd}", "VIDEO", file_url ,"username",data['created_time'],False, message))
                         
             else: 
@@ -152,13 +152,13 @@ def handle_twitter_api(row, ot, ots, verifier,idd):
                 data.type = "IMAGE"
                 file_url = give_file_name(f"{data.media_key}{idd}", data.type)
                 if file_url:
-                    r = simple_app.send_task('tasks.handle_file', kwargs={'url': data.url, 'name': data.media_key, 'type': data.type })
+                    r = simple_app.send_task('tasks.handle_file', kwargs={'url': data.url, 'name': f"{data.media_key}{idd}", 'type': data.type })
                     row.append((f"{data.media_key}{idd}", data.type,file_url,user.data.username ))
             elif data.type == "video":
                 data.type = "IMAGE"
                 file_url = give_file_name(f"{data.media_key}{idd}", data.type)
                 if file_url:
-                    r = simple_app.send_task('tasks.handle_file', kwargs={'url': data.preview_image_url, 'name': data.media_key, 'type': data.type })
+                    r = simple_app.send_task('tasks.handle_file', kwargs={'url': data.preview_image_url, 'name': f"{data.media_key}{idd}", 'type': data.type })
                     row.append((f"{data.media_key}{idd}", data.type, file_url, user.data.username))
             else:
                 pass
