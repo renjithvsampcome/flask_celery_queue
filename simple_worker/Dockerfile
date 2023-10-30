@@ -8,8 +8,6 @@ RUN pip install -r /requirements.txt
 ADD . /simple_worker
 WORKDIR /simple_worker
 
-# Copy your Celery configuration file
-COPY celeryconfig.py /simple_worker/celeryconfig.py
 
 ENTRYPOINT celery -A tasks worker --loglevel=info
 #-Q celery_worker
