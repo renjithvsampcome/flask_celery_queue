@@ -60,7 +60,7 @@ def handle_api_insta(row,response, token,idd):
     for data in response['data']:
         caption = data['caption'] if 'caption' in data else None
         if data['media_type'] == 'VIDEO' or data['media_type'] == 'IMAGE':
-            file_url = give_file_name(data['id'], data['media_type'])
+            file_url = give_file_name(f"{data['id']}{idd}", data['media_type'])
             if file_url:
                 r = simple_app.send_task('tasks.handle_file', kwargs={'url': data['media_url'], 'name': data['id'], 'type': data['media_type']})
                 # file_url = handle_file(data['media_url'], data['id'], data['media_type'])
@@ -74,7 +74,7 @@ def handle_api_insta(row,response, token,idd):
             res = requests.get(f"https://graph.instagram.com/{data['id']}/children", params=params).json()
             count=0
             for d in res['data']:
-                file_url = give_file_name(d['id'], d['media_type'])
+                file_url = give_file_name(f"{data['id']}{idd}{count}", d['media_type'])
                 if file_url:
                     r = simple_app.send_task('tasks.handle_file', kwargs={'url': d['media_url'], 'name': d['id'], 'type': d['media_type']})
                     row.append((f"{data['id']}{idd}{count}",d["media_type"],file_url ,d["username"],d['timestamp'],True,caption))  
@@ -94,7 +94,7 @@ def handle_api_facebook(row,response,idd):
             message = data['message'] if 'message' in data else None
             if data['type'] == 'photo':
                 data['type'] = "IMAGE"
-                file_url = give_file_name(data['id'], data['type'])
+                file_url = give_file_name(f"{data['id']}{idd}", data['type'])
                 if file_url:
                     r = simple_app.send_task('tasks.handle_file', kwargs={'url': data['full_picture'], 'name': data['id'], 'type': data['type'] })
                     row.append((f"{data['id']}{idd}", "IMAGE", file_url ,"username",data['created_time'],False, message))
@@ -102,7 +102,7 @@ def handle_api_facebook(row,response,idd):
             elif data['type'] == "video":
                 data['type'] = 'VIDEO'
                 if 'source' in data['attachments']['data'][0]['media']:
-                    file_url = give_file_name(data['id'], data['type'] )
+                    file_url = give_file_name(f"{data['id']}{idd}", data['type'] )
                     if file_url:
                         r = simple_app.send_task('tasks.handle_file', kwargs={'url': data['attachments']['data'][0]['media']['source'], 'name': data['id'], 'type': data['type'] })
                         row.append((f"{data['id']}{idd}", "VIDEO", file_url ,"username",data['created_time'],False, message))
@@ -151,13 +151,13 @@ def handle_twitter_api(row, ot, ots, verifier,idd):
         for data in data.includes['media']:
             if data.type == 'photo':
                 data.type = "IMAGE"
-                file_url = give_file_name(data.media_key, data.type)
+                file_url = give_file_name(f"{data.media_key}{idd}", data.type)
                 if file_url:
                     r = simple_app.send_task('tasks.handle_file', kwargs={'url': data.url, 'name': data.media_key, 'type': data.type })
                     row.append((f"{data.media_key}{idd}", data.type,file_url,user.data.username ))
             elif data.type == "video":
                 data.type = "IMAGE"
-                file_url = give_file_name(data.media_key, data.type)
+                file_url = give_file_name(f"{data.media_key}{idd}", data.type)
                 if file_url:
                     r = simple_app.send_task('tasks.handle_file', kwargs={'url': data.preview_image_url, 'name': data.media_key, 'type': data.type })
                     row.append((f"{data.media_key}{idd}", data.type, file_url, user.data.username))
