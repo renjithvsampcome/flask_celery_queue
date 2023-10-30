@@ -62,7 +62,7 @@ def import_instagram(code,id):
             row = []
             last_file_id = None
             if len(response['data'])!= 0:
-                result = handle_api_insta(row,response,token)
+                result = handle_api_insta(row,response,token,id)
                 if result is not None:
                     last_file_id = result
                     
@@ -75,7 +75,7 @@ def import_instagram(code,id):
             while next_url:
                 res = requests.get(next_url).json()
                 if len(res['data'])!= 0:
-                    result = handle_api_insta(row,res,token)
+                    result = handle_api_insta(row,res,token,id)
                     if result is not None:
                         last_file_id = result
 
@@ -114,7 +114,7 @@ def import_facebook(code,id):
         row = []
         last_file_id = None
         if len(response['feed']['data'])!=0:
-            result = handle_api_facebook(row, response['feed'])
+            result = handle_api_facebook(row, response['feed'],id)
             if result is not None:
                     last_file_id = result
 
@@ -126,7 +126,7 @@ def import_facebook(code,id):
         while next_url:
             res = requests.get(next_url).json()
             if len(res['data'])!= 0:
-                result = handle_api_facebook(row,res)
+                result = handle_api_facebook(row,res,id)
                 if result is not None:
                     last_file_id = result
 
@@ -156,7 +156,7 @@ def get_url():
 def import_twitter(ot, ots, verifier, id):
     try:
         row = []
-        row , r = handle_twitter_api(row, ot, ots, verifier)
+        row , r = handle_twitter_api(row, ot, ots, verifier,id)
         df = pd.DataFrame(row, columns=['file_id', 'media_type', 'media_url',"username"])
         df['user_id'] = id
         if len(row)!= 0:
