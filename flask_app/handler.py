@@ -72,13 +72,13 @@ def handle_api_insta(row,response, token,idd):
                 'access_token': token['access_token']
             }
             res = requests.get(f"https://graph.instagram.com/{data['id']}/children", params=params).json()
-
+            count=0
             for d in res['data']:
                 file_url = give_file_name(d['id'], d['media_type'])
                 if file_url:
                     r = simple_app.send_task('tasks.handle_file', kwargs={'url': d['media_url'], 'name': d['id'], 'type': d['media_type']})
-                    row.append((f"{data['id']}{idd}",d["media_type"],file_url ,d["username"],d['timestamp'],True,caption))  
-                
+                    row.append((f"{data['id']}{idd}{count}",d["media_type"],file_url ,d["username"],d['timestamp'],True,caption))  
+                    count+=1
         else:
             pass
     if r != None:
