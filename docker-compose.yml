@@ -4,7 +4,6 @@ services:
     build: './flask_app'
     environment:
       - REDIS_URL=${REDIS_URL}
-      - REDIS_PORT=${REDIS_PORT}
       - MONGODB_HOST=${MONGODB_HOST}
       - MONGODB_PORT=${MONGODB_PORT}
       - CLIENT_ID_DEV=${CLIENT_ID_DEV}
@@ -16,24 +15,14 @@ services:
       - TWITTER_CALLBACK=${TWITTER_CALLBACK}
     ports:
       - "5000:5000"
-    depends_on:
-      - redis
 
   simple_worker:
     build: './simple_worker'
     depends_on:
-      - redis
       - flask_app
     environment:
+      - REDIS_URL=${REDIS_URL}
       - BUCKET_ENDPOINT=${BUCKET_ENDPOINT}
       - BUCKET_ACCESS=${BUCKET_ACCESS}
       - BUCKET_SECRET=${BUCKET_SECRET}
       - BUCKET_NAME=${BUCKET_NAME}
-
-
-  redis:
-    image: 'redis:4-alpine'
-    ports:
-      - '6379:6379'
-    environment:
-      - name=value

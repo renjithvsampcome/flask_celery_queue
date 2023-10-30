@@ -8,11 +8,10 @@ import tweepy
 from celery.utils.log import get_task_logger
 import json
 
-
 load_dotenv()
 logger = get_task_logger(__name__)
 
-simple_app = Celery('simple_worker', broker='redis://redis:6379/0', backend='redis://redis:6379/0')
+simple_app = Celery('simple_worker', broker=os.environ.get('REDIS_URL'), backend=os.environ.get('REDIS_URL'))
 
 client_id_dev = os.environ.get("CLIENT_ID_DEV")
 client_secret_dev = os.environ.get("CLINET_SECERET_DEV")

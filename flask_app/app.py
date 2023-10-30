@@ -1,5 +1,4 @@
 
-from celery import Celery
 from flask import Flask, request, jsonify
 import pandas as pd
 import requests
@@ -8,27 +7,13 @@ from sqlalchemy import create_engine
 from handler import get_access_token, handle_api_insta, handle_api_facebook, handle_twitter_api, get_access_url, get_status
 import pangres as pg
 import os
-import logging
 from logging.handlers import RotatingFileHandler
-import tweepy
 
-# Configure logging
-log_handler = RotatingFileHandler('app.log', maxBytes=10240, backupCount=10)
-log_handler.setFormatter(logging.Formatter('%(asctime)s %(levelname)s: %(message)s [in %(pathname)s:%(lineno)d]'))
 
-console_handler = logging.StreamHandler()
-console_handler.setLevel(logging.DEBUG)
-
-# Create the root logger
-root_logger = logging.getLogger()
-root_logger.setLevel(logging.DEBUG)
-root_logger.addHandler(log_handler)
-root_logger.addHandler(console_handler)
 
 load_dotenv()
 
 app = Flask(__name__)
-
 
 
 connection_string = os.environ.get("DB_CONNECTION_STRING")

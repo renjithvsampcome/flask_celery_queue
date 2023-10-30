@@ -7,27 +7,18 @@ from celery.utils.log import get_task_logger
 
 logger = get_task_logger(__name__)
 
-app = Celery('tasks', broker='redis://redis:6379/0', backend='redis://redis:6379/0')
-
-
 bucket_endpoint = os.environ.get("BUCKET_ENDPOINT")
 bucket_access = os.environ.get("BUCKET_ACCESS") 
 bucket_secret = os.environ.get("BUCKET_SECRET")
 bucket_name = os.environ.get("BUCKET_NAME")
+
+app = Celery('tasks', broker=os.environ.get('REDIS_URL'), backend=os.environ.get('REDIS_URL'))
 
 
 s3 = boto3.client('s3',
                 endpoint_url=bucket_endpoint,
                 aws_access_key_id=bucket_access,
                 aws_secret_access_key=bucket_secret)
-
-@app.task()
-def longtime_add(x, y):
-    logger.info('Got Request - Starting work ')
-    time.sleep(4)
-    logger.info('Work Finished ')
-    return x + y
-
 
 
 @app.task()
