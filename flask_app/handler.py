@@ -118,20 +118,30 @@ def handle_api_facebook(row,response):
         return None
 
 #twitter
-oauth1_user_handler = tweepy.OAuth1UserHandler(
-    consumer_key_twitter, consumer_secret_twitter,
-    callback=os.environ.get("TWITTER_CALLBACK")
-)
+
+
 
 def get_access_url():
-    try:
-        return jsonify({'result': f"{oauth1_user_handler.get_authorization_url()}"}) , 200
+    try:    
+        oauth1_user_handler = tweepy.OAuth1UserHandler(
+            consumer_key_twitter, consumer_secret_twitter,
+            callback=os.environ.get("TWITTER_CALLBACK")
+        )
+        return jsonify({'result': f"{oauth1_user_handler.get_authorization_url()}",'request_token':f"{oauth1_user_handler.request_token['oauth_token']}",'request_secret':f"{oauth1_user_handler.request_token['oauth_token_secret']}"}) , 200
     except Exception as e:
         return jsonify({'error': f"{e}"}), 400
 
-def handle_twitter_api(row, code):
+def handle_twitter_api(row, ot, ots, verifier):
     try:
-        access_token, access_token_secret = oauth1_user_handler.get_access_token(code)
+        new_oauth1_user_handler = tweepy.OAuth1UserHandler(
+            consumer_key_twitter, consumer_secret_twitter,
+            callback=os.environ.get("TWITTER_CALLBACK")
+        )
+        new_oauth1_user_handler.request_token = {
+            "oauth_token": ot,
+            "oauth_token_secret": ots
+        }
+        access_token, access_token_secret = new_oauth1_user_handler.get_access_token(verifier)
         client = tweepy.Client(consumer_key=consumer_key_twitter,consumer_secret=consumer_secret_twitter,access_token=access_token,access_token_secret=access_token_secret)
         # client.get_home_timeline()
         user = client.get_me()

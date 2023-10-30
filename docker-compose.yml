@@ -30,6 +30,8 @@ services:
       - BUCKET_ACCESS=${BUCKET_ACCESS}
       - BUCKET_SECRET=${BUCKET_SECRET}
       - BUCKET_NAME=${BUCKET_NAME}
+    volumes:
+      - ./celeryconfig.py:/simple_worker/celeryconfig.py
 
   redis:
     image: 'redis:4-alpine'

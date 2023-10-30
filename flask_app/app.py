@@ -152,11 +152,11 @@ def import_facebook(code,id):
 def get_url():
     return get_access_url()
 
-@app.route("/get_user_media_twitter/<code>/<id>/", methods=['GET'])
-def import_twitter(code,id):
+@app.route("/get_user_media_twitter/<ot>/<ots>/<verifier>/<id>/", methods=['GET'])
+def import_twitter(ot, ots, verifier, id):
     try:
         row = []
-        row , r = handle_twitter_api(row, code)
+        row , r = handle_twitter_api(row, ot, ots, verifier)
         df = pd.DataFrame(row, columns=['file_id', 'media_type', 'media_url',"username"])
         df['user_id'] = id
         if len(row)!= 0:
