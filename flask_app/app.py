@@ -159,8 +159,8 @@ def import_twitter(ot, ots, verifier, id):
 @app.route("/get_user_media_youtube/<channel_id>/<id>/",methods=['GET'])
 def import_youtube(channel_id,id):
     try:
-        row = []
-        row , last_file_id = handle_youtube_import(row,channel_id,id)
+        data = []
+        row , last_file_id = handle_youtube_import(data,channel_id,id)
         if len(row)==0:
             return jsonify({'error': "No shorts to upload"}) , 400
         else:
