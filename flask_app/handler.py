@@ -210,12 +210,12 @@ def handle_youtube_import(row, channel_id,id):
             print(response.status_code)
             print(response.url)
             # if response.url == video_url:
-            if response.status_code == 200:
-                name = f"{video_id}{id}"
-                file_url = give_file_name(name,'SHORTS')
-                if file_url:
-                    r = simple_app.send_task('tasks.handle_youtube_file', kwargs={'url': video_url, 'name': name , 'type': "SHORTS" })
-                    row.append((name, d['snippet']['title'], d['snippet']['publishedAt'], file_url,"SHORTS"))
+            # if response.status_code == 200:
+            #     name = f"{video_id}{id}"
+            #     file_url = give_file_name(name,'SHORTS')
+            #     if file_url:
+            #         r = simple_app.send_task('tasks.handle_youtube_file', kwargs={'url': video_url, 'name': name , 'type': "SHORTS" })
+            #         row.append((name, d['snippet']['title'], d['snippet']['publishedAt'], file_url,"SHORTS"))
         if r is not None:
             return row, r.id
         else:
