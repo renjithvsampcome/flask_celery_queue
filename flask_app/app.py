@@ -7,7 +7,8 @@ from sqlalchemy import create_engine
 from handler import get_access_token, handle_api_insta, handle_api_facebook, handle_twitter_api, get_access_url, get_status, handle_youtube_import
 import pangres as pg
 import os
-from logging.handlers import RotatingFileHandler
+import sys
+import logging
 
 
 
@@ -15,6 +16,13 @@ load_dotenv()
 
 app = Flask(__name__)
 
+app.logger.setLevel(logging.DEBUG)
+stream_handler = logging.StreamHandler()
+app.logger.addHandler(stream_handler)
+
+# Redirect sys.stdout and sys.stderr to the Flask logger
+sys.stdout = stream_handler.stream
+sys.stderr = stream_handler.stream
 
 connection_string = os.environ.get("DB_CONNECTION_STRING")
 engine = create_engine(connection_string)
