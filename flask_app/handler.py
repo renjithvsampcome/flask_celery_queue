@@ -204,7 +204,8 @@ def handle_youtube_import(row, channel_id,id):
         for d in videos:
             video_id = d['snippet']['resourceId']['videoId']
             video_url = f"https://www.youtube.com/shorts/{video_id}"
-            response = requests.head(video_url)
+            headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36'}
+            response = requests.head(video_url,allow_redirects=True, headers=headers)
             # print(video_url)
             print(response.status_code)
             # if response.url == video_url:
