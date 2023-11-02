@@ -4,7 +4,7 @@ import pandas as pd
 import requests
 from dotenv import load_dotenv
 from sqlalchemy import create_engine
-from handler import get_access_token, handle_api_insta, handle_api_facebook, handle_twitter_api, get_access_url, get_status
+from handler import get_access_token, handle_api_insta, handle_api_facebook, handle_twitter_api, get_access_url, get_status, handle_youtube_import
 import pangres as pg
 import os
 from logging.handlers import RotatingFileHandler
@@ -156,5 +156,24 @@ def import_twitter(ot, ots, verifier, id):
     except Exception as e:
         return  jsonify({'error':f"Encounter an exception importing twitter data: {e}"}),500
 
+@app.route("/get_user_media_youtube/<channel_id>/<id>/",methods=['GET'])
+def import_youtube(channel_id,id):
+    try:
+        row = []
+        row , last_file_id = handle_youtube_import(row,channel_id,id)
+        if len(row)==0:
+            return jsonify({'error': "No shorts to upload"}) , 400
+        else:
+            df = pd.DataFrame(row, columns=['file_id', 'title', 'published_time',"file_url","type"])
+            df['user_id'] = id
+            df['channel_id'] = channel_id
+            pg.upsert(
+                        con=engine,
+                        df=df.set_index('file_id'),
+                        table_name='import_youtube',
+                        if_row_exists='update', schema='public', chunksize=10000)
+            return jsonify({'status':"Pending", "last_job_id": last_file_id}) , 200
+    except Exception as e:
+        return  jsonify({'error':f"Encounter an exception importing youtube data: {e}"}),500
 
 

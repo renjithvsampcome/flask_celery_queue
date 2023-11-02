@@ -4,6 +4,8 @@ import boto3
 import os
 from celery import Celery
 from celery.utils.log import get_task_logger
+from pytube import YouTube
+from pytube.exceptions import VideoUnavailable
 
 logger = get_task_logger(__name__)
 
@@ -57,3 +59,26 @@ def handle_file(url,name,type):
     except Exception as e:
         logger.info(f"An error occurred: {str(e)}")
         return None
+
+@app.task()
+def handle_youtube_file(url,name):
+    try:
+        yt = YouTube(url)
+        # print(f'Downloading video: {url}')
+        title = yt.title
+        yt.streams.first().download()
+        file_name = f"shorts_{name}.mp4"
+        os.rename(f'{title}.mp4', file_name)
+        s3.upload_file(file_name, bucket_name, file_name)
+        s3.put_object_acl(ACL='public-read', Bucket=bucket_name, Key=file_name)
+        os.remove(file_name)
+        logger.info("File saved successfully.")
+        file_url = f'https://vude-bucket.blr1.digitaloceanspaces.com/test-dev/{file_name}'
+        return file_url
+    except VideoUnavailable:
+        print(f'Video {url} is unavaialable, skipping.')
+    else:
+        return None
+        
+        
+        

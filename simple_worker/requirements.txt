@@ -2,3 +2,4 @@ celery[redis]
 boto3
 python-dotenv
 Requests
+pytube

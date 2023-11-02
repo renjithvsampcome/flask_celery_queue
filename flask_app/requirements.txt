@@ -9,3 +9,4 @@ SQLAlchemy
 psycopg2-binary
 pangres
 tweepy
+google-api-python-client

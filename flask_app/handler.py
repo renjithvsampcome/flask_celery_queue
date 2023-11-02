@@ -6,6 +6,7 @@ from dotenv import load_dotenv
 from celery import Celery
 import tweepy
 from celery.utils.log import get_task_logger
+import googleapiclient.discovery
 import json
 
 load_dotenv()
@@ -13,6 +14,7 @@ logger = get_task_logger(__name__)
 
 simple_app = Celery('simple_worker', broker=os.environ.get('REDIS_URL'), backend=os.environ.get('REDIS_URL'))
 
+API_KEY_YOUTUBE = os.environ.get("API_KEY_YOUTUBE")
 client_id_dev = os.environ.get("CLIENT_ID_DEV")
 client_secret_dev = os.environ.get("CLINET_SECERET_DEV")
 redirect_uri_dev = os.environ.get("REDIRECT_URI_DEV")
@@ -45,11 +47,13 @@ def get_access_token(code):
     except Exception as e:
         return jsonify({'error': str(e)})
 
-def  give_file_name(name,type):
+def give_file_name(name,type):
     if type == 'VIDEO':
         file_name = f"video_{name}.mp4"
     elif type == "IMAGE":
         file_name = f"image_{name}.jpg"
+    elif type == "SHORTS":
+        file_name = f"shorts_{name}.mp4"
     else:
         return None
     return f'https://vude-bucket.blr1.digitaloceanspaces.com/test-dev/{file_name}'
@@ -169,3 +173,51 @@ def handle_twitter_api(row, ot, ots, verifier,idd):
         
     # print(data.includes['media'][0].preview_image_url) 
     # print(data.includes['media'][0].ype)
+
+
+
+def get_channel_video(channel_id):
+    youtube = googleapiclient.discovery.build('youtube', 'v3', developerKey=API_KEY_YOUTUBE)
+
+    videos = []
+    res = youtube.channels().list(id=channel_id, part='contentDetails').execute()
+    # print(res)
+    playlist_id =res['items'][0]['contentDetails']['relatedPlaylists']['uploads']
+    
+    next_page_token = None
+    while True:
+        result = youtube.playlistItems().list(playlistId=playlist_id, part = 'snippet',maxResults = 50, pageToken = next_page_token).execute()
+        videos += result['items']
+
+        if 'nextPageToken' not in result:
+            break
+        next_page_token = res['nextPageToken']
+        if next_page_token is None:
+            break
+    return videos
+
+def handle_youtube_import(row, channel_id,id):
+    videos = get_channel_video(channel_id)
+    r = None
+    if len(videos) != 0:
+        for d in videos:
+            video_id = d['snippet']['resourceId']['videoId']
+            video_url = f"https://www.youtube.com/shorts/{video_id}"
+            response = requests.head(video_url, allow_redirects=True)
+            # print(response.url)
+            # print(video_url)
+            if response.url == video_url:
+                name = f"{video_id}{id}"
+                file_url = give_file_name(name,'SHORTS')
+                if file_url:
+                    r = simple_app.send_task('tasks.handle_youtube_file', kwargs={'url': video_url, 'name': name , 'type': "SHORTS" })
+                    row.append((name, d['snippet']['title'], d['snippet']['publishedAt'], file_url,"SHORTS"))
+        if r is not None:
+            return row, r.id
+        else:
+            return row, None
+        
+    else:
+        return row, None
+
+    
