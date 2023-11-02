@@ -207,6 +207,7 @@ def handle_youtube_import(row, channel_id,id):
             video_url = f"https://www.youtube.com/shorts/{video_id}"
             try:
                 yt = YouTube(video_url)
+                print(yt.length)
                 if yt.length <= 100:
                     name = f"{video_id}{id}"
                     file_url = give_file_name(name,'SHORTS')
