@@ -198,13 +198,15 @@ def get_channel_video(channel_id):
 
 def handle_youtube_import(row, channel_id,id):
     videos = get_channel_video(channel_id)
+    print(videos)
     r = None
     if len(videos) != 0:
         for d in videos:
             video_id = d['snippet']['resourceId']['videoId']
             video_url = f"https://www.youtube.com/shorts/{video_id}"
+            print(video_url)
             response = requests.head(video_url, allow_redirects=True)
-            # print(response.url)
+            print(response.url)
             # print(video_url)
             if response.url == video_url:
                 name = f"{video_id}{id}"
