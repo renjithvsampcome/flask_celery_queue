@@ -206,8 +206,9 @@ def handle_youtube_import(row, channel_id,id):
             video_url = f"https://www.youtube.com/shorts/{video_id}"
             headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36'}
             response = requests.head(video_url,allow_redirects=True, headers=headers)
-            # print(video_url)
+            print(video_url)
             print(response.status_code)
+            print(response.url)
             # if response.url == video_url:
             if response.status_code == 200:
                 name = f"{video_id}{id}"
