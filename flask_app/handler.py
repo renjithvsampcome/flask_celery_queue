@@ -204,11 +204,11 @@ def handle_youtube_import(row, channel_id,id):
         for d in videos:
             video_id = d['snippet']['resourceId']['videoId']
             video_url = f"https://www.youtube.com/shorts/{video_id}"
-            print(video_url)
             response = requests.head(video_url)
-            print(response.url)
             # print(video_url)
-            if response.url == video_url:
+            print(response.status_code)
+            # if response.url == video_url:
+            if response.status_code == 200:
                 name = f"{video_id}{id}"
                 file_url = give_file_name(name,'SHORTS')
                 if file_url:
