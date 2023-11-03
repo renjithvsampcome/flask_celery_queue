@@ -209,7 +209,7 @@ def handle_youtube_import(row, channel_id,id):
                     name = f"{video_id}{id}"
                     file_url = give_file_name(name,'SHORTS')
                     if file_url:
-                        r = simple_app.send_task('tasks.handle_youtube_file', kwargs={'url': video_url, 'name': name})
+                        r = simple_app.send_task('tasks.handle_youtube_file', kwargs={'url': video_url, 'name': name, 'type': "SHORTS"})
                         row.append((name, d['snippet']['title'], d['snippet']['publishedAt'], file_url,"SHORTS", r.id))
             except:
                 pass

@@ -61,7 +61,7 @@ def handle_file(url,name,type):
         return None
 
 @app.task()
-def handle_youtube_file(url,name):
+def handle_youtube_file(url,name,type):
     try:
         yt = YouTube(url)
         # print(f'Downloading video: {url}')
