@@ -83,7 +83,6 @@ def handle_file(url,name,type):
 
     except Exception as e:
         logger.info(f"An error occurred: {str(e)}")
-        db_conn.close()
         return None
 
 @app.task()
@@ -101,7 +100,7 @@ def handle_youtube_file(url,name,type):
         logger.info("File saved successfully.")
         file_url = f'https://vude-bucket.blr1.digitaloceanspaces.com/test-dev/{file_name}'
         # add to dv
-        job_id = handle_file.request.id
+        job_id = handle_youtube_file.request.id
         update_query = "INSERT INTO public.import_job_status (job_id, status) VALUES (%s, %s)"
         cursor.execute(update_query, (job_id,"SUCCESS"))
         cursor.close()
@@ -109,7 +108,6 @@ def handle_youtube_file(url,name,type):
         return file_url
     except VideoUnavailable:
         print(f'Video {url} is unavaialable, skipping.')
-        db_conn.close()
     else:
         return None
         
