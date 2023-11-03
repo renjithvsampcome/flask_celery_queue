@@ -68,7 +68,7 @@ def handle_api_insta(row,response, token,idd):
             if file_url:
                 r = simple_app.send_task('tasks.handle_file', kwargs={'url': data['media_url'], 'name': f"{data['id']}{idd}", 'type': data['media_type']})
                 # file_url = handle_file(data['media_url'], data['id'], data['media_type'])
-                row.append((f"{data['id']}{idd}", data["media_type"],file_url ,data["username"],data['timestamp'],False, caption))
+                row.append((f"{data['id']}{idd}", data["media_type"],file_url ,data["username"],data['timestamp'],False, caption, r.id))
                 
         elif data['media_type'] == 'CAROUSEL_ALBUM':
             params = {
@@ -81,7 +81,7 @@ def handle_api_insta(row,response, token,idd):
                 file_url = give_file_name(f"{d['id']}{idd}{count}", d['media_type'])
                 if file_url:
                     r = simple_app.send_task('tasks.handle_file', kwargs={'url': d['media_url'], 'name': f"{d['id']}{idd}{count}", 'type': d['media_type']})
-                    row.append((f"{data['id']}{idd}{count}",d["media_type"],file_url ,d["username"],d['timestamp'],True,caption))  
+                    row.append((f"{data['id']}{idd}{count}",d["media_type"],file_url ,d["username"],d['timestamp'],True,caption,r.id))  
                     count+=1
         else:
             pass
@@ -101,7 +101,7 @@ def handle_api_facebook(row,response,idd):
                 file_url = give_file_name(f"{data['id']}{idd}", data['type'])
                 if file_url:
                     r = simple_app.send_task('tasks.handle_file', kwargs={'url': data['full_picture'], 'name': f"{data['id']}{idd}", 'type': data['type'] })
-                    row.append((f"{data['id']}{idd}", "IMAGE", file_url ,"username",data['created_time'],False, message))
+                    row.append((f"{data['id']}{idd}", "IMAGE", file_url ,"username",data['created_time'],False, message, r.id))
                 
             elif data['type'] == "video":
                 data['type'] = 'VIDEO'
@@ -109,7 +109,7 @@ def handle_api_facebook(row,response,idd):
                     file_url = give_file_name(f"{data['id']}{idd}", data['type'] )
                     if file_url:
                         r = simple_app.send_task('tasks.handle_file', kwargs={'url': data['attachments']['data'][0]['media']['source'], 'name': f"{data['id']}{idd}", 'type': data['type'] })
-                        row.append((f"{data['id']}{idd}", "VIDEO", file_url ,"username",data['created_time'],False, message))
+                        row.append((f"{data['id']}{idd}", "VIDEO", file_url ,"username",data['created_time'],False, message, r.id))
                         
             else: 
                 pass
@@ -121,8 +121,6 @@ def handle_api_facebook(row,response,idd):
         return None
 
 #twitter
-
-
 
 def get_access_url():
     try:    
@@ -158,13 +156,13 @@ def handle_twitter_api(row, ot, ots, verifier,idd):
                 file_url = give_file_name(f"{data.media_key}{idd}", data.type)
                 if file_url:
                     r = simple_app.send_task('tasks.handle_file', kwargs={'url': data.url, 'name': f"{data.media_key}{idd}", 'type': data.type })
-                    row.append((f"{data.media_key}{idd}", data.type,file_url,user.data.username ))
+                    row.append((f"{data.media_key}{idd}", data.type,file_url,user.data.username, r.id ))
             elif data.type == "video":
                 data.type = "IMAGE"
                 file_url = give_file_name(f"{data.media_key}{idd}", data.type)
                 if file_url:
                     r = simple_app.send_task('tasks.handle_file', kwargs={'url': data.preview_image_url, 'name': f"{data.media_key}{idd}", 'type': data.type })
-                    row.append((f"{data.media_key}{idd}", data.type, file_url, user.data.username))
+                    row.append((f"{data.media_key}{idd}", data.type, file_url, user.data.username, r.id))
             else:
                 pass
         return row , r.id
@@ -212,7 +210,7 @@ def handle_youtube_import(row, channel_id,id):
                     file_url = give_file_name(name,'SHORTS')
                     if file_url:
                         r = simple_app.send_task('tasks.handle_youtube_file', kwargs={'url': video_url, 'name': name})
-                        row.append((name, d['snippet']['title'], d['snippet']['publishedAt'], file_url,"SHORTS"))
+                        row.append((name, d['snippet']['title'], d['snippet']['publishedAt'], file_url,"SHORTS", r.id))
             except:
                 pass
                 

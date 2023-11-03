@@ -76,7 +76,7 @@ def import_instagram(code,id):
                     next_url = res['paging']['next']
                 else: 
                     next_url = None
-            df = pd.DataFrame(row, columns=['file_id', 'media_type', 'media_url',"username","timestamp","is_album","caption"])
+            df = pd.DataFrame(row, columns=['file_id', 'media_type', 'media_url',"username","timestamp","is_album","caption","job_id"])
             df['user_id'] = id
             #save it to db
             pg.upsert(
@@ -128,7 +128,7 @@ def import_facebook(code,id):
             
             else: 
                 next_url = None
-        df = pd.DataFrame(row, columns=['file_id', 'media_type', 'media_url',"username","timestamp","is_album","caption"])
+        df = pd.DataFrame(row, columns=['file_id', 'media_type', 'media_url',"username","timestamp","is_album","caption", "job_id"])
         df['username'] = response['name']
         df['user_id'] = id
         pg.upsert(
@@ -150,7 +150,7 @@ def import_twitter(ot, ots, verifier, id):
     try:
         row = []
         row , r = handle_twitter_api(row, ot, ots, verifier,id)
-        df = pd.DataFrame(row, columns=['file_id', 'media_type', 'media_url',"username"])
+        df = pd.DataFrame(row, columns=['file_id', 'media_type', 'media_url',"username",'job_id'])
         df['user_id'] = id
         if len(row)!= 0:
             pg.upsert(
@@ -172,7 +172,7 @@ def import_youtube(channel_id,id):
         if len(row)==0:
             return jsonify({'error': "No shorts to upload"}) , 400
         else:
-            df = pd.DataFrame(row, columns=['file_id', 'title', 'published_time',"file_url","type"])
+            df = pd.DataFrame(row, columns=['file_id', 'title', 'published_time',"file_url","type","job_id"])
             df['user_id'] = id
             df['channel_id'] = channel_id
             pg.upsert(

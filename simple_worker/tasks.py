@@ -65,10 +65,8 @@ def handle_youtube_file(url,name):
     try:
         yt = YouTube(url)
         # print(f'Downloading video: {url}')
-        title = yt.title
-        yt.streams.first().download()
         file_name = f"shorts_{name}.mp4"
-        os.rename(f'{title}.mp4', file_name)
+        yt.streams.first().download(output_path='.', filename=file_name)
         s3.upload_file(file_name, bucket_name, file_name)
         s3.put_object_acl(ACL='public-read', Bucket=bucket_name, Key=file_name)
         os.remove(file_name)
