@@ -6,6 +6,7 @@ from celery import Celery
 from celery.utils.log import get_task_logger
 from pytube import YouTube
 from pytube.exceptions import VideoUnavailable
+import psycopg_binary
 
 logger = get_task_logger(__name__)
 
@@ -22,10 +23,26 @@ s3 = boto3.client('s3',
                 aws_access_key_id=bucket_access,
                 aws_secret_access_key=bucket_secret)
 
+db_connection = None
+
+def get_db_connection():
+    global db_connection
+    if db_connection is None:
+        db_connection = psycopg_binary.connect(
+            host=os.environ.get('DB_HOST'),
+            port=os.environ.get("DB_PORT"),
+            user=os.environ.get("DB_USER"),
+            password=os.environ.get("DB_PASSWORD"),
+            database=os.environ.get("DB_DATABASE")
+        )
+    return db_connection
+
+
 
 @app.task()
 def handle_file(url,name,type):
     try:
+        cursor = db_connection.cursor()
         # Send an HTTP GET request to the URL
         response = requests.get(url, stream=True, timeout=15)
         
@@ -48,22 +65,31 @@ def handle_file(url,name,type):
             os.remove(file_name)
             logger.info("File saved successfully.")
             file_url = f'https://vude-bucket.blr1.digitaloceanspaces.com/test-dev/{file_name}'
+            job_id = handle_file.request.id
+            update_query = "INSERT INTO public.import_job_status (job_id, status) VALUES (%s, %s)"
+            cursor.execute(update_query, (job_id,"SUCCESS"))
+            cursor.close()
+            db_connection.commit()
             return file_url
         else:
             logger.info(f"Request failed with status code {response.status_code}")
+            cursor.close()
             return None
     except requests.exceptions.Timeout:
         logger.info("Request timed out. Increase the timeout value.")
+        cursor.close()
         return None
 
     except Exception as e:
         logger.info(f"An error occurred: {str(e)}")
+        db_connection.close()
         return None
 
 @app.task()
 def handle_youtube_file(url,name,type):
     try:
         yt = YouTube(url)
+        cursor = db_connection.cursor()
         # print(f'Downloading video: {url}')
         file_name = f"shorts_{name}.mp4"
         yt.streams.first().download(output_path='.', filename=file_name)
@@ -72,9 +98,16 @@ def handle_youtube_file(url,name,type):
         os.remove(file_name)
         logger.info("File saved successfully.")
         file_url = f'https://vude-bucket.blr1.digitaloceanspaces.com/test-dev/{file_name}'
+        # add to dv
+        job_id = handle_file.request.id
+        update_query = "INSERT INTO public.import_job_status (job_id, status) VALUES (%s, %s)"
+        cursor.execute(update_query, (job_id,"SUCCESS"))
+        cursor.close()
+        db_connection.commit()
         return file_url
     except VideoUnavailable:
         print(f'Video {url} is unavaialable, skipping.')
+        db_connection.close()
     else:
         return None
         

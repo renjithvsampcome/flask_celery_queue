@@ -3,3 +3,4 @@ boto3
 python-dotenv
 Requests
 pytube
+psycopg2-binary
