@@ -172,7 +172,7 @@ def import_youtube(channel_id,id):
         if len(row)==0:
             return jsonify({'error': "No shorts to upload"}) , 400
         else:
-            df = pd.DataFrame(row, columns=['file_id', 'title', 'published_time',"file_url","type","job_id"])
+            df = pd.DataFrame(row, columns=['file_id', 'title', 'published_time',"media_url","media_type","job_id"])
             df['user_id'] = id
             df['channel_id'] = channel_id
             pg.upsert(

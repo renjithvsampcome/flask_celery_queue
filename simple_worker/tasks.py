@@ -6,7 +6,7 @@ from celery import Celery
 from celery.utils.log import get_task_logger
 from pytube import YouTube
 from pytube.exceptions import VideoUnavailable
-import psycopg_binary
+import psycopg2
 
 logger = get_task_logger(__name__)
 
@@ -28,7 +28,7 @@ db_connection = None
 def get_db_connection():
     global db_connection
     if db_connection is None:
-        db_connection = psycopg_binary.connect(
+        db_connection = psycopg2.connect(
             host=os.environ.get('DB_HOST'),
             port=os.environ.get("DB_PORT"),
             user=os.environ.get("DB_USER"),
