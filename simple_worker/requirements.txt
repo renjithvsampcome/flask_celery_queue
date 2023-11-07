@@ -1,6 +1,12 @@
 celery[redis]
+pytest-playwright
+playwright-stealth
+requests
 boto3
 python-dotenv
 Requests
 pytube
 psycopg2-binary
+pandas
+SQLAlchemy
+pangres

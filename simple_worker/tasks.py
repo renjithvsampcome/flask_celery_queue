@@ -7,6 +7,7 @@ from celery.utils.log import get_task_logger
 from pytube import YouTube
 from pytube.exceptions import VideoUnavailable
 import psycopg2
+import shutil
 
 logger = get_task_logger(__name__)
 
@@ -110,6 +111,16 @@ def handle_youtube_file(url,name,type):
         print(f'Video {url} is unavaialable, skipping.')
     else:
         return None
-        
+
+
+@app.task()
+def handle_login_onlyfans(userid,email,pwd):
+    os.system(f"python3 test_plyw.py --email {email} --password {pwd} --userid {userid}") 
+    folder_path = "profiles" 
+    if os.path.exists(folder_path):
+        shutil.rmtree(folder_path)
+        print(f"Folder '{folder_path}' and its contents have been removed.")
+    else:
+        print(f"Folder '{folder_path}' does not exist.") 
         
         

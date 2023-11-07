@@ -4,7 +4,7 @@ import pandas as pd
 import requests
 from dotenv import load_dotenv
 from sqlalchemy import create_engine
-from handler import get_access_token, handle_api_insta, handle_api_facebook, handle_twitter_api, get_access_url, get_status, handle_youtube_import
+from handler import get_access_token, handle_api_insta, handle_api_facebook, handle_twitter_api, get_access_url, get_status, handle_youtube_import, scrape_handler_onlyfans
 import pangres as pg
 import os
 import sys
@@ -184,4 +184,20 @@ def import_youtube(channel_id,id):
     except Exception as e:
         return  jsonify({'error':f"Encounter an exception importing youtube data: {e}"}),500
 
+@app.route('/post_onlyfans_data', methods=['POST'])
+def login():
+    # Get the JSON data from the request
+    data = request.get_json()
 
+    # Check if both 'email' and 'password' are provided in the request
+    if 'email' not in data or 'password' not in data or 'userid' not in data:
+        return jsonify({'error': 'Missing email or password or userid'}), 400
+
+    email = data['email']
+    password = data['password']
+    vude_id = data['userid']
+
+    rid = scrape_handler_onlyfans(email,password, vude_id)
+    return jsonify({'status':"Pending", "last_job_id": rid}) , 200
+
+    
