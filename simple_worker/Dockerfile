@@ -5,6 +5,7 @@ COPY requirements.txt /
 RUN pip install -r /requirements.txt
 
 RUN playwright install chromium
+RUN playwright install-deps
 
 #COPY app.py /app.py
 ADD . /simple_worker
