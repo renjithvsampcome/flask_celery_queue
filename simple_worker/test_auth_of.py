@@ -29,7 +29,7 @@ def test_login(email, pwd, vude_id):
             page.fill('input[name="email"]', email)
             page.fill('input[name="password"]', pwd)
             page.click('button[type=submit]')
-            page.locator('a[data-name="Profile"].m-size-lg-hover').click()
+            # page.locator('a[data-name="Profile"].m-size-lg-hover').click()
             
             data = context.cookies("https://onlyfans.com")
             sess = None
@@ -50,6 +50,7 @@ def test_login(email, pwd, vude_id):
                 "user-agent" : "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36",
                 "vude-id": vude_id
             }
+            print(clinet_side_values)
             if all(value is not None for value in clinet_side_values.values()):
                 try:
                     onlyfans_downloader_script(clinet_side_values)
