@@ -18,7 +18,7 @@ def test_login(email, pwd, vude_id):
 
     try:
         with sync_playwright() as p:
-            browser = p.chromium.launch(headless=True, slow_mo=100)
+            browser = p.chromium.launch(headless=False, slow_mo=100)
             context = browser.new_context()
             page = context.new_page()
             with recaptchav3.SyncSolver(page) as solver:
@@ -30,7 +30,6 @@ def test_login(email, pwd, vude_id):
             page.fill('input[name="password"]', pwd)
             page.click('button[type=submit]')
             # page.locator('a[data-name="Profile"].m-size-lg-hover').click()
-            
             data = context.cookies("https://onlyfans.com")
             sess = None
             x_bc = None
