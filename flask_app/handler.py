@@ -234,7 +234,7 @@ def handle_youtube_import(row, channel_id,id):
     else:
         return row, None
 
-    
+
 def scrape_handler_onlyfans(email,password,vude_id):
     r = simple_app.send_task('tasks.handle_login_onlyfans', kwargs={'userid': vude_id, 'email': email, 'pwd': password})
     return r.id

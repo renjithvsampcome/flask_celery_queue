@@ -1,6 +1,5 @@
 celery[redis]
 pytest-playwright
-playwright-stealth
 requests
 boto3
 python-dotenv
@@ -10,3 +9,6 @@ psycopg2-binary
 pandas
 SQLAlchemy
 pangres
+playwright-recaptcha
+ffmpeg-python
+
