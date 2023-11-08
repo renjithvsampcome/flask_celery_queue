@@ -27,10 +27,10 @@ def request_handler(request):
         if all(x is not None for x in (user_agent,user_id,x_bc)):
             break
 
-def test_login(args):
-    email = args.email
-    pwd = args.password
-    vude_id = args.userid
+def test_login(email, pwd, vude_id):
+    # email = args.email
+    # pwd = args.password
+    # vude_id = args.userid
 
     try:
         with sync_playwright() as p:
@@ -63,19 +63,25 @@ def test_login(args):
             }
             try:
                 onlyfans_downloader_script(clinet_side_values)
+                return True
             except Exception as e:
                 print(f"error while onlyfans loader: {e}")
+                return False
+                # raise Exception(f"error while onlyfans loader: {e}")
+                
     except Exception as e:
         print(f"error while logging onlyfans: {e}")
+        # raise Exception(f"error while onlyfans loader: {e}")
+        return False
 
 
-if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='Playwright Script')
-    parser.add_argument('--email', type=str, help='email argument')
-    parser.add_argument('--password', type=str, help='pssword argument')
-    parser.add_argument('--userid', type=str, help='onlyfans-userid argument')
+# if __name__ == '__main__':
+#     parser = argparse.ArgumentParser(description='Playwright Script')
+#     parser.add_argument('--email', type=str, help='email argument')
+#     parser.add_argument('--password', type=str, help='pssword argument')
+#     parser.add_argument('--userid', type=str, help='onlyfans-userid argument')
 
-    args = parser.parse_args()
-    test_login(args)
+#     args = parser.parse_args()
+#     test_login(args)
 
     

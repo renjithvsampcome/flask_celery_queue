@@ -8,6 +8,7 @@ from pytube import YouTube
 from pytube.exceptions import VideoUnavailable
 import psycopg2
 import shutil
+from test_auth_of import test_login
 
 logger = get_task_logger(__name__)
 
@@ -109,18 +110,18 @@ def handle_youtube_file(url,name,type):
         return file_url
     except VideoUnavailable:
         print(f'Video {url} is unavaialable, skipping.')
-    else:
-        return None
-
 
 @app.task()
 def handle_login_onlyfans(userid,email,pwd):
-    os.system(f"python3 test_plyw.py --email {email} --password {pwd} --userid {userid}") 
+    handle_login = test_login(email,pwd, userid)
     folder_path = "profiles" 
     if os.path.exists(folder_path):
         shutil.rmtree(folder_path)
         print(f"Folder '{folder_path}' and its contents have been removed.")
     else:
         print(f"Folder '{folder_path}' does not exist.") 
+        raise Exception("failed")
+    if handle_login == False:
+        raise Exception("Task Failed while login_onlyfans")
         
         
