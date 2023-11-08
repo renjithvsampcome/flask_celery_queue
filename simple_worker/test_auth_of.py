@@ -18,12 +18,13 @@ def test_login(email, pwd, vude_id):
 
     try:
         with sync_playwright() as p:
-            browser = p.chromium.launch(headless=False, slow_mo=100)
+            browser = p.chromium.launch(headless=True, slow_mo=100)
             context = browser.new_context()
             page = context.new_page()
             with recaptchav3.SyncSolver(page) as solver:
                 page.goto("https://antcpt.com/score_detector/")
                 token = solver.solve_recaptcha()
+                print(token)
             page.goto('https://onlyfans.com/')
             
             page.fill('input[name="email"]', email)
