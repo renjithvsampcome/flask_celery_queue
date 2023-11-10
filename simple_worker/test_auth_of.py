@@ -35,10 +35,7 @@ def test_login(email, pwd, vude_id):
             page.fill('input[name="email"]', email)
             page.fill('input[name="password"]', pwd)
             page.click('button[type=submit]')
-            page.wait_for_load_state("load")
-            # Get the HTML content of the current page
-            html_content = page.content()
-            print(html_content)
+            
             page.locator('a[data-name="Profile"].m-size-lg-hover').click()
             data = context.cookies("https://onlyfans.com")
             sess = None
