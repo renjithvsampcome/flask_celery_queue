@@ -26,17 +26,16 @@ def test_login(email, pwd, vude_id):
             )
             context = browser.new_context(user_agent=ua)
             page = context.new_page()
-            with recaptchav3.SyncSolver(page) as solver:
-                page.goto("https://antcpt.com/score_detector/")
+            with recaptchav3.SyncSolver(page,60) as solver:
+                page.goto('https://onlyfans.com/')
                 token = solver.solve_recaptcha()
                 print(token)
-            page.goto('https://onlyfans.com/')
-            
-            page.fill('input[name="email"]', email)
-            page.fill('input[name="password"]', pwd)
-            page.click('button[type=submit]')
-            
-            page.locator('a[data-name="Profile"].m-size-lg-hover').click()
+                page.fill('input[name="email"]', email)
+                page.fill('input[name="password"]', pwd)
+                page.click('button[type=submit]')
+                page.locator('a[data-name="Profile"].m-size-lg-hover').click()
+                
+
             data = context.cookies("https://onlyfans.com")
             sess = None
             x_bc = None
