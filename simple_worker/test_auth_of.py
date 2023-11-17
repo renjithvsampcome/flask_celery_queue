@@ -37,7 +37,7 @@ def test_login(email, pwd, vude_id):
                 token = solver.solve_recaptcha(wait=True,image_challenge=True)
                 print(token)
                 page.click('button[type=submit]')
-                page.locator('a[data-name="Profile"].m-size-lg-hover').click()
+                # page.locator('a[data-name="Profile"].m-size-lg-hover').click()
                 
 
             data = context.cookies("https://onlyfans.com")
