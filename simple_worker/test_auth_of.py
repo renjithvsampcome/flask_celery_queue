@@ -37,9 +37,9 @@ def test_login(email, pwd, vude_id):
                 token = solver.solve_recaptcha(wait=True,image_challenge=True)
                 print(token)
                 page.click('button[type=submit]')
-                page.locator('a[data-name="Profile"].m-size-lg-hover').click()
-                html_content = page.content()
-                print(html_content)
+                # page.locator('a[data-name="Profile"].m-size-lg-hover').click()
+                # html_content = page.content()
+                # print(html_content)
 
                 # page.locator('a[data-name="Profile"].m-size-lg-hover').click()
             
