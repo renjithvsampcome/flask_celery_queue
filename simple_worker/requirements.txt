@@ -10,5 +10,6 @@ pandas
 SQLAlchemy
 pangres
 playwright-recaptcha
+playwright-stealth
 ffmpeg-python
 

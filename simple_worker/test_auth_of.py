@@ -1,6 +1,7 @@
 
 from playwright.sync_api import Page, expect, sync_playwright
 from playwright_recaptcha import recaptchav3, recaptchav2
+from playwright_stealth import stealth_sync
 from onlyfans import onlyfans_downloader_script
 from dotenv import load_dotenv
 import os
@@ -27,6 +28,7 @@ def test_login(email, pwd, vude_id):
             )
             context = browser.new_context(user_agent=ua)
             page = context.new_page()
+            stealth_sync(page)
             with recaptchav2.SyncSolver(page,capsolver_api_key=os.environ.get("CAPSOLVER_KEY")) as solver:
                 page.goto('https://onlyfans.com/')
                 page.fill('input[name="email"]', email)
@@ -34,7 +36,7 @@ def test_login(email, pwd, vude_id):
                 page.click('button[type=submit]')
                 # page.goto("https://antcpt.com/score_detector/")
                 token = solver.solve_recaptcha(wait=True,image_challenge=True)
-                print(token)
+                # print(token)
                 page.click('button[type=submit]')
                 
 
