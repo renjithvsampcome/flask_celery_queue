@@ -34,10 +34,10 @@ def test_login(email, pwd, vude_id):
                 page.fill('input[name="email"]', email)
                 page.fill('input[name="password"]', pwd)
                 page.click('button[type=submit]')
-                # page.goto("https://antcpt.com/score_detector/")
                 token = solver.solve_recaptcha(wait=True,image_challenge=True)
-                # print(token)
+                print(token)
                 page.click('button[type=submit]')
+                page.locator('a[data-name="Profile"].m-size-lg-hover').click()
                 
 
             data = context.cookies("https://onlyfans.com")
