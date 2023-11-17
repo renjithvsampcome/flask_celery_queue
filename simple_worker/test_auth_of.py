@@ -1,8 +1,9 @@
 
 from playwright.sync_api import Page, expect, sync_playwright
-from playwright_recaptcha import recaptchav3
+from playwright_recaptcha import recaptchav3, recaptchav2
 from onlyfans import onlyfans_downloader_script
 from dotenv import load_dotenv
+import os
 
 load_dotenv()
 
@@ -26,14 +27,15 @@ def test_login(email, pwd, vude_id):
             )
             context = browser.new_context(user_agent=ua)
             page = context.new_page()
-            with recaptchav3.SyncSolver(page,60) as solver:
+            with recaptchav2.SyncSolver(page,capsolver_api_key=os.environ.get("CAPSOLVER_KEY")) as solver:
                 page.goto('https://onlyfans.com/')
-                token = solver.solve_recaptcha()
-                print(token)
                 page.fill('input[name="email"]', email)
                 page.fill('input[name="password"]', pwd)
                 page.click('button[type=submit]')
-                page.locator('a[data-name="Profile"].m-size-lg-hover').click()
+                # page.goto("https://antcpt.com/score_detector/")
+                token = solver.solve_recaptcha(wait=True,image_challenge=True)
+                print(token)
+                page.click('button[type=submit]')
                 
 
             data = context.cookies("https://onlyfans.com")
