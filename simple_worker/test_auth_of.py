@@ -5,6 +5,7 @@ from playwright_stealth import stealth_sync
 from onlyfans import onlyfans_downloader_script
 from dotenv import load_dotenv
 import os
+import time
 
 load_dotenv()
 
@@ -35,14 +36,14 @@ def test_login(email, pwd, vude_id):
                 page.fill('input[name="password"]', pwd)
                 page.click('button[type=submit]')
                 token = solver.solve_recaptcha(wait=True,image_challenge=True)
-                print(token)
+                # print(token)
                 page.click('button[type=submit]')
                 # page.locator('a[data-name="Profile"].m-size-lg-hover').click()
                 # html_content = page.content()
                 # print(html_content)
 
                 # page.locator('a[data-name="Profile"].m-size-lg-hover').click()
-            
+            time.sleep(4)
             data = context.cookies("https://onlyfans.com")
             print(data)
             sess = None
