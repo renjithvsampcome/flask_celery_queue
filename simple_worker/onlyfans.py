@@ -184,7 +184,7 @@ def select_sub():
     # Select Model
     if ARG1 == "all":
         return ALL_LIST
-    MODELS = "0"
+    MODELS = "1"
     if MODELS == "0":
         return ALL_LIST
     else:
