@@ -68,8 +68,8 @@ def test_login(email, pwd, vude_id):
             print(clinet_side_values)
             if all(value is not None for value in clinet_side_values.values()):
                 try:
+
                     onlyfans_downloader_script(clinet_side_values)
-                    browser.close()
                 except Exception as e:
                     print(f"Error from onlyfans downloader: {e}")
                 
