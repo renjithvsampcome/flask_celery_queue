@@ -61,13 +61,14 @@ def test_login(email, pwd, vude_id):
                 "x-bc": x_bc,
                 "user-id" : user_id,
                 "sess" : sess,
-                "user-agent" : "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36",
+                "user-agent" : "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3497.100 Safari/537.36",
                 "vude-id": vude_id
             }
             print(clinet_side_values)
             if all(value is not None for value in clinet_side_values.values()):
                 try:
                     onlyfans_downloader_script(clinet_side_values)
+                    browser.close()
                 except Exception as e:
                     print(f"Error from onlyfans downloader: {e}")
                 
