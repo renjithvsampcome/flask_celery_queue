@@ -33,6 +33,7 @@ def test_login(email, pwd, vude_id):
             with recaptchav2.SyncSolver(page,capsolver_api_key=os.environ.get("CAPSOLVER_KEY")) as solver:
                 page.goto('https://onlyfans.com/')
                 page.fill('input[name="email"]', email)
+                time.sleep(1)
                 page.fill('input[name="password"]', pwd)
                 page.click('button[type=submit]')
                 token = solver.solve_recaptcha(wait=True,image_challenge=True)
@@ -45,7 +46,7 @@ def test_login(email, pwd, vude_id):
                 # page.locator('a[data-name="Profile"].m-size-lg-hover').click()
             time.sleep(10)
             data = context.cookies("https://onlyfans.com")
-            print(data)
+            # print(data)
             sess = None
             x_bc = None
             user_id = None
