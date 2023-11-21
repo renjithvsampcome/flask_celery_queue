@@ -21,7 +21,7 @@ def test_login(email, pwd, vude_id):
 
     try:
         with sync_playwright() as p:
-            browser = p.firefox.launch(headless=True, slow_mo=100)
+            browser = p.chromium.launch(headless=True, slow_mo=100)
             ua = (
             "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
             "AppleWebKit/537.36 (KHTML, like Gecko) "
@@ -36,14 +36,14 @@ def test_login(email, pwd, vude_id):
                 page.fill('input[name="password"]', pwd)
                 page.click('button[type=submit]')
                 token = solver.solve_recaptcha(wait=True,image_challenge=True)
-                # print(token)
+                print(token)
                 page.click('button[type=submit]')
                 # page.locator('a[data-name="Profile"].m-size-lg-hover').click()
                 # html_content = page.content()
                 # print(html_content)
 
                 # page.locator('a[data-name="Profile"].m-size-lg-hover').click()
-            time.sleep(4)
+            time.sleep(10)
             data = context.cookies("https://onlyfans.com")
             print(data)
             sess = None
