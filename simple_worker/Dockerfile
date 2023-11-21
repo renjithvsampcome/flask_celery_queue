@@ -4,7 +4,7 @@ FROM python:3.8-slim
 COPY requirements.txt /
 RUN pip install -r /requirements.txt
 
-RUN playwright install firefox
+RUN playwright install chromium
 RUN playwright install-deps
 
 #COPY app.py /app.py
