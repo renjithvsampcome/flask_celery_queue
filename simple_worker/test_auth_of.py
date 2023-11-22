@@ -13,6 +13,18 @@ x_bc = None
 user_id = None
 user_agent = None
 
+def request_handler(request):
+    headers = request.headers
+    url = request.url
+    method = request.method
+    print(f"Request URL: {url}")
+    print(f"Request Method: {method}")
+    print("Request Headers:")
+    for key, value in headers.items():
+        print(f"{key}: {value}")
+    print("-----------------------------")
+
+
 
 def test_login(email, pwd, vude_id):
     # email = args.email
@@ -22,12 +34,12 @@ def test_login(email, pwd, vude_id):
     try:
         with sync_playwright() as p:
             browser = p.chromium.launch(headless=True, slow_mo=100)
-            # ua = (
-            # "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
-            # "AppleWebKit/537.36 (KHTML, like Gecko) "
-            # "Chrome/69.0.3497.100 Safari/537.36"
-            # )
-            # context = browser.new_context(user_agent=ua)
+            ua = (
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+            "AppleWebKit/537.36 (KHTML, like Gecko) "
+            "Chrome/69.0.3497.100 Safari/537.36"
+            )
+            context = browser.new_context(user_agent=ua)
             context = browser.new_context()
             page = context.new_page()
             stealth_sync(page)
@@ -42,9 +54,10 @@ def test_login(email, pwd, vude_id):
                 token = solver.solve_recaptcha(wait=True,image_challenge=True)
                 print(token)
                 page.click('button[type=submit]')
-                
-            time.sleep(60)
+                page.on("request", request_handler)
             # page.on("request", request_handler)
+
+            time.sleep(15)
             data = context.cookies("https://onlyfans.com")  
             # print(data)
             sess = None
@@ -69,7 +82,6 @@ def test_login(email, pwd, vude_id):
             print(clinet_side_values)
             if all(value is not None for value in clinet_side_values.values()):
                 try:
-
                     onlyfans_downloader_script(clinet_side_values)
                 except Exception as e:
                     print(f"Error from onlyfans downloader: {e}")
