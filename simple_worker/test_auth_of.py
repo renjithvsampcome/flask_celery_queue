@@ -30,22 +30,25 @@ def test_login(email, pwd, vude_id):
             context = browser.new_context(user_agent=ua)
             page = context.new_page()
             stealth_sync(page)
-            with recaptchav2.SyncSolver(page,capsolver_api_key=os.environ.get("CAPSOLVER_KEY")) as solver:
-                page.goto('https://onlyfans.com/')
+            page.goto('https://onlyfans.com/')
+            with recaptchav2.SyncSolver(page,capsolver_api_key="CAP-7ACC999B67FAEA2BBD1020DAD1DA00B7") as solver:
+                
                 page.fill('input[name="email"]', email)
                 time.sleep(1)
                 page.fill('input[name="password"]', pwd)
                 page.click('button[type=submit]')
+                # page.goto("https://antcpt.com/score_detector/")
                 token = solver.solve_recaptcha(wait=True,image_challenge=True)
                 print(token)
                 page.click('button[type=submit]')
-                # page.locator('a[data-name="Profile"].m-size-lg-hover').click()
-                # html_content = page.content()
-                # print(html_content)
-
-                # page.locator('a[data-name="Profile"].m-size-lg-hover').click()
+                
+            # page.fill('input[name="email"]', email)
+            # page.fill('input[name="password"]', pwd)
+            # page.click('button[type=submit]')
+            # page.on("request", request_handler)
             time.sleep(10)
-            data = context.cookies("https://onlyfans.com")
+            # page.on("request", request_handler)
+            data = context.cookies("https://onlyfans.com")  
             # print(data)
             sess = None
             x_bc = None
@@ -58,6 +61,7 @@ def test_login(email, pwd, vude_id):
                 if d['name'] == "auth_id":
                     user_id = d['value']
             # time.sleep(20)
+            # print(data)
             clinet_side_values = {
                 "x-bc": x_bc,
                 "user-id" : user_id,
