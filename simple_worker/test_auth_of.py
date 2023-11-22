@@ -34,12 +34,12 @@ def test_login(email, pwd, vude_id):
     try:
         with sync_playwright() as p:
             browser = p.chromium.launch(headless=True, slow_mo=100)
-            ua = (
-            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
-            "AppleWebKit/537.36 (KHTML, like Gecko) "
-            "Chrome/69.0.3497.100 Safari/537.36"
-            )
-            context = browser.new_context(user_agent=ua)
+            # ua = (
+            # "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+            # "AppleWebKit/537.36 (KHTML, like Gecko) "
+            # "Chrome/69.0.3497.100 Safari/537.36"
+            # )
+            context = browser.new_context()
             context = browser.new_context()
             page = context.new_page()
             stealth_sync(page)
@@ -76,7 +76,7 @@ def test_login(email, pwd, vude_id):
                 "x-bc": x_bc,
                 "user-id" : user_id,
                 "sess" : sess,
-                "user-agent" : page.evaluate("navigator.userAgent"),
+                "user-agent" : 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/120.0.6099.28 Safari/537.36',
                 "vude-id": vude_id
             }
             print(clinet_side_values)
