@@ -42,7 +42,7 @@ def test_login(email, pwd, vude_id):
                 print(token)
                 page.click('button[type=submit]')
                 
-            time.sleep(30)
+            time.sleep(60)
             # page.on("request", request_handler)
             data = context.cookies("https://onlyfans.com")  
             # print(data)
