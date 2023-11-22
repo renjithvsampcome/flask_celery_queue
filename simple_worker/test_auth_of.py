@@ -42,10 +42,6 @@ def test_login(email, pwd, vude_id):
                 print(token)
                 page.click('button[type=submit]')
                 
-            # page.fill('input[name="email"]', email)
-            # page.fill('input[name="password"]', pwd)
-            # page.click('button[type=submit]')
-            # page.on("request", request_handler)
             time.sleep(10)
             # page.on("request", request_handler)
             data = context.cookies("https://onlyfans.com")  
