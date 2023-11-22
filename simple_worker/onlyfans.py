@@ -415,20 +415,20 @@ def onlyfans_downloader_script(authData):
         # first save profile info
         print("Saving profile info...")
 
-        sinf = {
-            "id": PROFILE_INFO["id"],
-            "name": PROFILE_INFO["name"],
-            "username": PROFILE_INFO["username"],
-            "about": PROFILE_INFO["rawAbout"],
-            "joinDate": PROFILE_INFO["joinDate"],
-            "website": PROFILE_INFO["website"],
-            "wishlist": PROFILE_INFO["wishlist"],
-            "location": PROFILE_INFO["location"],
-            "lastSeen": PROFILE_INFO["lastSeen"]
-        }
+        # sinf = {
+        #     "id": PROFILE_INFO["id"],
+        #     "name": PROFILE_INFO["name"],
+        #     "username": PROFILE_INFO["username"],
+        #     "about": PROFILE_INFO["rawAbout"],
+        #     "joinDate": PROFILE_INFO["joinDate"],
+        #     "website": PROFILE_INFO["website"],
+        #     "wishlist": PROFILE_INFO["wishlist"],
+        #     "location": PROFILE_INFO["location"],
+        #     "lastSeen": PROFILE_INFO["lastSeen"]
+        # }
 
-        with open("profiles/" + PROFILE + "/info.json", 'w') as infojson:
-            json.dump(sinf, infojson)
+        # with open("profiles/" + PROFILE + "/info.json", 'w') as infojson:
+        #     json.dump(sinf, infojson)
 
         # download_public_files()
 
