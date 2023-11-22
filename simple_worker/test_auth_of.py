@@ -22,12 +22,13 @@ def test_login(email, pwd, vude_id):
     try:
         with sync_playwright() as p:
             browser = p.chromium.launch(headless=True, slow_mo=100)
-            ua = (
-            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
-            "AppleWebKit/537.36 (KHTML, like Gecko) "
-            "Chrome/69.0.3497.100 Safari/537.36"
-            )
-            context = browser.new_context(user_agent=ua)
+            # ua = (
+            # "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+            # "AppleWebKit/537.36 (KHTML, like Gecko) "
+            # "Chrome/69.0.3497.100 Safari/537.36"
+            # )
+            # context = browser.new_context(user_agent=ua)
+            context = browser.new_context()
             page = context.new_page()
             stealth_sync(page)
             page.goto('https://onlyfans.com/')
