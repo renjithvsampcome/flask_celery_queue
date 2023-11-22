@@ -357,11 +357,9 @@ def get_all_photos(images):
 def onlyfans_downloader_script(authData):
 
     print("\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
-    print("~ I AM THE GREAT KORNHOLIO ~")
-    print("~  ARE U THREATENING ME??  ~")
-    print("~                          ~")
-    print("~    COOMERS GUNNA COOM    ~")
-    print("~    HACKERS GUNNA HACK    ~")
+    print("~ Scrapper Scripts start ~")
+    print("~  .....wait....  ~")
+    print("~  .....wait....  ~")
     print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n")
 
     # Gather inputs
