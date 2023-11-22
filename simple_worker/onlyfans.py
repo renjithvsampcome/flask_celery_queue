@@ -140,7 +140,7 @@ def get_user_info(profile):
     if "error" in info:
         print("\nERROR: " + info["error"]["message"])
         # bail, we need info for both profiles to be correct
-        exit()
+        raise Exception("error")
     return info
 
 # to get subscribesCount for displaying all subs
@@ -150,7 +150,7 @@ def user_me():
     if "error" in me:
         print("\nERROR: " + me["error"]["message"])
         # bail, we need info for both profiles to be correct
-        exit()
+        raise Exception('error')
     return me
 
 # get all subscriptions in json
@@ -179,8 +179,7 @@ def select_sub():
         sub_dict.update({i+1: SUBS[i]["username"]})
     if len(sub_dict) == 1:
         print('No models subbed')
-        exit()
-
+        raise Exception('error')
     # Select Model
     if ARG1 == "all":
         return ALL_LIST
@@ -448,7 +447,7 @@ def onlyfans_downloader_script(authData):
         archived_postcount = len(archived_posts)
         if postcount + archived_postcount == 0:
             print("ERROR: 0 posts found.")
-            exit()
+            raise Exception("error")
         global total_count
         total_count = postcount + archived_postcount
 
