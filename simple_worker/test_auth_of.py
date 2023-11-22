@@ -13,18 +13,6 @@ x_bc = None
 user_id = None
 user_agent = None
 
-def request_handler(request):
-    headers = request.headers
-    url = request.url
-    method = request.method
-    print(f"Request URL: {url}")
-    print(f"Request Method: {method}")
-    print("Request Headers:")
-    for key, value in headers.items():
-        print(f"{key}: {value}")
-    print("-----------------------------")
-
-
 
 def test_login(email, pwd, vude_id):
     # email = args.email
@@ -40,7 +28,6 @@ def test_login(email, pwd, vude_id):
             # "Chrome/69.0.3497.100 Safari/537.36"
             # )
             context = browser.new_context()
-            context = browser.new_context()
             page = context.new_page()
             stealth_sync(page)
             page.goto('https://onlyfans.com/')
@@ -52,9 +39,8 @@ def test_login(email, pwd, vude_id):
                 page.click('button[type=submit]')
                 # page.goto("https://antcpt.com/score_detector/")
                 token = solver.solve_recaptcha(wait=True,image_challenge=True)
-                print(token)
                 page.click('button[type=submit]')
-                page.on("request", request_handler)
+                
             # page.on("request", request_handler)
 
             time.sleep(15)
