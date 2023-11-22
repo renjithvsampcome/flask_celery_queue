@@ -62,7 +62,7 @@ def test_login(email, pwd, vude_id):
                 "x-bc": x_bc,
                 "user-id" : user_id,
                 "sess" : sess,
-                "user-agent" : "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3497.100 Safari/537.36",
+                "user-agent" : page.evaluate("navigator.userAgent"),
                 "vude-id": vude_id
             }
             print(clinet_side_values)

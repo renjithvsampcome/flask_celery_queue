@@ -1,12 +1,3 @@
-#!/usr/bin/python3
-#
-# OnlyFans Profile Downloader/Archiver
-# KORNHOLIO 2020
-#
-# See README for help/info.
-#
-# This program is Free Software, licensed under the
-# terms of GPLv3. See LICENSE.txt for details.
 
 import re
 import os
@@ -20,6 +11,11 @@ import hashlib
 import pandas as pd
 import random
 import boto3
+from sqlalchemy import create_engine
+import pangres as pg
+from dotenv import load_dotenv
+
+load_dotenv()
 
 # maximum number of posts to index
 # DONT CHANGE THAT
@@ -152,7 +148,7 @@ def get_user_info(profile):
 def user_me():
     me = api_request("/users/me").json()
     if "error" in me:
-        print("\nERROR: " + me["error"]["message"]+ " hi")
+        print("\nERROR: " + me["error"]["message"])
         # bail, we need info for both profiles to be correct
         exit()
     return me
@@ -252,14 +248,11 @@ def download_file(source, file_name_single):
         r.raw.decode_content = True
         shutil.copyfileobj(r.raw, f)
 
-    # bucket_endpoint = os.environ.get("BUCKET_ENDPOINT")
-    # bucket_access = os.environ.get("BUCKET_ACCESS") 
-    # bucket_secret = os.environ.get("BUCKET_SECRET")
-    # bucket_name = os.environ.get("BUCKET_NAME")
-    bucket_endpoint = 'https://vude-bucket.blr1.digitaloceanspaces.com'
-    bucket_access = 'DO008ABP6L4KCMZZ9P98'
-    bucket_secret = 'DNaCh8JZuDlA3OQf1WAeJAtwqTdxvBWJ/MhfxzIcb2M'
-    bucket_name = 'test-dev'
+    bucket_endpoint = os.environ.get("BUCKET_ENDPOINT")
+    bucket_access = os.environ.get("BUCKET_ACCESS") 
+    bucket_secret = os.environ.get("BUCKET_SECRET")
+    bucket_name = os.environ.get("BUCKET_NAME")
+    
 
     s3 = boto3.client('s3',
                 endpoint_url=bucket_endpoint,
@@ -471,6 +464,12 @@ def onlyfans_downloader_script(authData):
         df = pd.DataFrame(row, columns=['onlyfans_id','media_type','media_url'])
         df['user_id'] = authData['vude-id']
         df['file_id'] = df['user_id'].astype(str) + '_' + (df.groupby('onlyfans_id').cumcount() + 1).astype(str)
-        print(df)
+        connection_string = os.environ.get("DB_CONNECTION_STRING")
+        engine = create_engine(connection_string)
+        pg.upsert(
+                con=engine,
+                df=df.set_index('file_id'),
+                table_name='import_onlyfans',
+                if_row_exists='update', schema='public', chunksize=10000)
         # download_posts(cur_count, archived_posts, True, row, "ARCHIVE", authData['user-id'])
         print("Downloaded " + str(new_files) + " new files.")
