@@ -260,6 +260,7 @@ def download_file(source, file_name_single):
     
     s3.upload_file(file_name, bucket_name, file_name_single)
     s3.put_object_acl(ACL='public-read', Bucket=bucket_name, Key=file_name_single)
+    os.remove("profiles/" + file_name_single)
     
         
 
