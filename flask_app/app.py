@@ -34,6 +34,11 @@ def get_last_job_status(task_id):
         return jsonify({'success': True}), 200
     else:
         return jsonify({"success": False}), 200
+    
+@app.route('/onlyfans_status/<task_id>')
+def get_job_status_onlyfans(task_id):
+    return jsonify({'result': get_status(task_id)}), 200
+
 
 @app.route('/get_user_media_insta/<code>/<id>', methods=['GET'])
 def import_instagram(code,id):
