@@ -22,11 +22,6 @@ def test_login(email, pwd, vude_id):
     try:
         with sync_playwright() as p:
             browser = p.chromium.launch(headless=True, slow_mo=100)
-            # ua = (
-            # "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
-            # "AppleWebKit/537.36 (KHTML, like Gecko) "
-            # "Chrome/69.0.3497.100 Safari/537.36"
-            # )
             context = browser.new_context()
             page = context.new_page()
             stealth_sync(page)
@@ -37,11 +32,8 @@ def test_login(email, pwd, vude_id):
                 time.sleep(1)
                 page.fill('input[name="password"]', pwd)
                 page.click('button[type=submit]')
-                # page.goto("https://antcpt.com/score_detector/")
                 token = solver.solve_recaptcha(wait=True,image_challenge=True)
                 page.click('button[type=submit]')
-                
-            # page.on("request", request_handler)
 
             time.sleep(15)
             data = context.cookies("https://onlyfans.com")  
@@ -56,8 +48,7 @@ def test_login(email, pwd, vude_id):
                     x_bc = d['value']
                 if d['name'] == "auth_id":
                     user_id = d['value']
-            # time.sleep(20)
-            # print(data)
+            
             clinet_side_values = {
                 "x-bc": x_bc,
                 "user-id" : user_id,
