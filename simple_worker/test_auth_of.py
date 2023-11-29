@@ -73,7 +73,6 @@ def test_login(email, pwd, vude_id):
                     raise Exception(f"onlyfans scrapper got crashed")
                 
             else:
-                print(f"auth not complete encounter some error")
                 raise Exception(f"error while logging onlyfans, client_side_value_missing")
                 
     except Exception as e:
@@ -81,14 +80,5 @@ def test_login(email, pwd, vude_id):
         # raise Exception(f"error while onlyfans loader: {e}")
         return False
 
-
-# if __name__ == '__main__':
-#     parser = argparse.ArgumentParser(description='Playwright Script')
-#     parser.add_argument('--email', type=str, help='email argument')
-#     parser.add_argument('--password', type=str, help='pssword argument')
-#     parser.add_argument('--userid', type=str, help='onlyfans-userid argument')
-
-#     args = parser.parse_args()
-#     test_login(args)
 
     
