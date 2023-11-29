@@ -95,7 +95,7 @@ def handle_youtube_file(url,name,type):
         cursor = db_conn.cursor()
         # print(f'Downloading video: {url}')
         file_name = f"shorts_{name}.mp4"
-        yt.streams.first().download(output_path='.', filename=file_name)
+        yt.streams.get_highest_resolution().download(output_path='.', filename=file_name)
         s3.upload_file(file_name, bucket_name, file_name)
         s3.put_object_acl(ACL='public-read', Bucket=bucket_name, Key=file_name)
         os.remove(file_name)
@@ -108,8 +108,8 @@ def handle_youtube_file(url,name,type):
         cursor.close()
         db_conn.commit()
         return file_url
-    except VideoUnavailable:
-        print(f'Video {url} is unavaialable, skipping.')
+    except:
+        raise Exception(f'Video is unavaialable, skipping.')
 
 @app.task()
 def handle_login_onlyfans(userid,email,pwd):

@@ -31,7 +31,7 @@ def test_login(email, pwd, vude_id):
             page = context.new_page()
             stealth_sync(page)
             page.goto('https://onlyfans.com/')
-            with recaptchav2.SyncSolver(page,capsolver_api_key="CAP-7ACC999B67FAEA2BBD1020DAD1DA00B7") as solver:
+            with recaptchav2.SyncSolver(page,capsolver_api_key=os.environ.get('CAPSOLVER_KEY')) as solver:
                 
                 page.fill('input[name="email"]', email)
                 time.sleep(1)
@@ -70,7 +70,7 @@ def test_login(email, pwd, vude_id):
                 try:
                     onlyfans_downloader_script(clinet_side_values)
                 except Exception as e:
-                    print(f"Error from onlyfans downloader: {e}")
+                    raise Exception(f"onlyfans scrapper got crashed")
                 
             else:
                 print(f"auth not complete encounter some error")
