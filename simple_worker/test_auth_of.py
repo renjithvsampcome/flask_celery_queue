@@ -19,6 +19,9 @@ def test_login(email, pwd, vude_id):
             if key == 'user-agent':
                 global user_agent
                 user_agent = value
+            if key == 'user-id':
+                global user_idd
+                user_idd = value
 
     try:
         with sync_playwright() as p:
@@ -28,7 +31,6 @@ def test_login(email, pwd, vude_id):
             stealth_sync(page)
             try:
                 page.goto('https://onlyfans.com/')
-                page.on("request", request_handler)
                 with recaptchav2.SyncSolver(page,capsolver_api_key=os.environ.get('CAPSOLVER_KEY')) as solver:
                     
                     page.fill('input[name="email"]', email)
@@ -38,10 +40,12 @@ def test_login(email, pwd, vude_id):
                     token = solver.solve_recaptcha(wait=True,image_challenge=True)
                     print(token)
                     page.click('button[type=submit]')
-                    # page.on("request", request_handler)
+                    page.locator('a[data-name="Profile"].m-size-lg-hover').click()
+                    page.on("request", request_handler)
             except RecaptchaNotFoundError:
-                # page.on("request", request_handler)
-                pass
+                page.locator('a[data-name="Profile"].m-size-lg-hover').click()
+                page.on("request", request_handler)
+                
 
             time.sleep(30)
             data = context.cookies("https://onlyfans.com")  
@@ -55,8 +59,8 @@ def test_login(email, pwd, vude_id):
                 if d['name'] == "fp":
                     x_bc = d['value']
                 if d['name'] == "auth_id":
-                    user_id = d['value']
-            
+                    id_value = d['value']
+            user_id = id_value if id_value is not None else user_idd
             clinet_side_values = {
                 "x-bc": x_bc,
                 "user-id" : user_id,
