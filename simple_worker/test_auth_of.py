@@ -1,6 +1,6 @@
 
 from playwright.sync_api import Page, expect, sync_playwright
-from playwright_recaptcha import recaptchav3, recaptchav2 , RecaptchaNotFoundError
+from playwright_recaptcha import recaptchav3, recaptchav2
 from playwright_stealth import stealth_sync
 from onlyfans import onlyfans_downloader_script
 from dotenv import load_dotenv
@@ -10,18 +10,11 @@ import time
 load_dotenv()
 
 
-def test_login(email, pwd, vude_id):
-    # user_agent = None
 
-    def request_handler(request):
-        headers = request.headers
-        for key, value in headers.items():
-            if key == 'user-agent':
-                global user_agent
-                user_agent = value
-            if key == 'user-id':
-                global user_idd
-                user_idd = value
+def test_login(email, pwd, vude_id):
+    # email = args.email
+    # pwd = args.password
+    # vude_id = args.userid
 
     try:
         with sync_playwright() as p:
@@ -29,27 +22,20 @@ def test_login(email, pwd, vude_id):
             context = browser.new_context()
             page = context.new_page()
             stealth_sync(page)
-            try:
-                page.goto('https://onlyfans.com/')
-                with recaptchav2.SyncSolver(page,capsolver_api_key=os.environ.get('CAPSOLVER_KEY')) as solver:
-                    
-                    page.fill('input[name="email"]', email)
-                    time.sleep(1)
-                    page.fill('input[name="password"]', pwd)
-                    page.click('button[type=submit]')
-                    token = solver.solve_recaptcha(wait=True,image_challenge=True)
-                    print(token)
-                    page.click('button[type=submit]')
-                    page.locator('a[data-name="Profile"].m-size-lg-hover').click()
-                    page.on("request", request_handler)
-            except RecaptchaNotFoundError:
-                page.locator('a[data-name="Profile"].m-size-lg-hover').click()
-                page.on("request", request_handler)
+            page.goto('https://onlyfans.com/')
+            with recaptchav2.SyncSolver(page,capsolver_api_key=os.environ.get('CAPSOLVER_KEY')) as solver:
                 
+                page.fill('input[name="email"]', email)
+                time.sleep(1)
+                page.fill('input[name="password"]', pwd)
+                page.click('button[type=submit]')
+                token = solver.solve_recaptcha(wait=True,image_challenge=True)
+                print(token)
+                page.click('button[type=submit]')
 
-            time.sleep(30)
+            time.sleep(15)
             data = context.cookies("https://onlyfans.com")  
-            print(data)
+            # print(data)
             sess = None
             x_bc = None
             user_id = None
@@ -59,29 +45,23 @@ def test_login(email, pwd, vude_id):
                 if d['name'] == "fp":
                     x_bc = d['value']
                 if d['name'] == "auth_id":
-                    id_value = d['value']
-            user_id = id_value if id_value is not None else user_idd
+                    user_id = d['value']
+            
             clinet_side_values = {
                 "x-bc": x_bc,
                 "user-id" : user_id,
                 "sess" : sess,
-                "user-agent" : user_agent,
+                "user-agent" : 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/120.0.6099.28 Safari/537.36',
                 "vude-id": vude_id
             }
             print(clinet_side_values)
             if all(value is not None for value in clinet_side_values.values()):
                 try:
                     onlyfans_downloader_script(clinet_side_values)
-                    page.context.close()
-                    browser.close()
                 except Exception as e:
-                    page.context.close()
-                    browser.close()
                     raise Exception(f"onlyfans scrapper got crashed")
                 
             else:
-                page.context.close()
-                browser.close()
                 raise Exception(f"error while logging onlyfans, client_side_value_missing")
                 
     except Exception as e:
