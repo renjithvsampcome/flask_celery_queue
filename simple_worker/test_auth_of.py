@@ -11,7 +11,7 @@ load_dotenv()
 
 
 def test_login(email, pwd, vude_id):
-    user_agent = None
+    # user_agent = None
 
     def request_handler(request):
         headers = request.headers
@@ -34,6 +34,7 @@ def test_login(email, pwd, vude_id):
                     time.sleep(1)
                     page.fill('input[name="password"]', pwd)
                     page.click('button[type=submit]')
+                    page.on("request", request_handler)
                     solver.solve_recaptcha(wait=True,image_challenge=True)
                     page.click('button[type=submit]')
                     page.on("request", request_handler)
