@@ -28,18 +28,19 @@ def test_login(email, pwd, vude_id):
             stealth_sync(page)
             try:
                 page.goto('https://onlyfans.com/')
+                page.on("request", request_handler)
                 with recaptchav2.SyncSolver(page,capsolver_api_key=os.environ.get('CAPSOLVER_KEY')) as solver:
                     
                     page.fill('input[name="email"]', email)
                     time.sleep(1)
                     page.fill('input[name="password"]', pwd)
                     page.click('button[type=submit]')
-                    page.on("request", request_handler)
                     solver.solve_recaptcha(wait=True,image_challenge=True)
                     page.click('button[type=submit]')
-                    page.on("request", request_handler)
+                    # page.on("request", request_handler)
             except RecaptchaNotFoundError:
-                page.on("request", request_handler)
+                # page.on("request", request_handler)
+                pass
 
             time.sleep(15)
             data = context.cookies("https://onlyfans.com")  
