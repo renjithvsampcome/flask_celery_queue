@@ -43,9 +43,9 @@ def test_login(email, pwd, vude_id):
                 # page.on("request", request_handler)
                 pass
 
-            time.sleep(15)
+            time.sleep(30)
             data = context.cookies("https://onlyfans.com")  
-            # print(data)
+            print(data)
             sess = None
             x_bc = None
             user_id = None
