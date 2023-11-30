@@ -12,9 +12,13 @@ load_dotenv()
 
 
 def test_login(email, pwd, vude_id):
-    # email = args.email
-    # pwd = args.password
-    # vude_id = args.userid
+    
+    def request_handler(request):
+        headers = request.headers
+        for key, value in headers.items():
+            if key == 'user-agent':
+                global user_agent
+                user_agent = value
 
     try:
         with sync_playwright() as p:
@@ -23,17 +27,18 @@ def test_login(email, pwd, vude_id):
             page = context.new_page()
             stealth_sync(page)
             page.goto('https://onlyfans.com/')
+            page.on("request", request_handler)
             with recaptchav2.SyncSolver(page,capsolver_api_key=os.environ.get('CAPSOLVER_KEY')) as solver:
                 
                 page.fill('input[name="email"]', email)
-                time.sleep(1)
                 page.fill('input[name="password"]', pwd)
+                time.sleep(2)
                 page.click('button[type=submit]')
                 token = solver.solve_recaptcha(wait=True,image_challenge=True)
                 print(token)
                 page.click('button[type=submit]')
 
-            time.sleep(15)
+            time.sleep(30)
             data = context.cookies("https://onlyfans.com")  
             # print(data)
             sess = None
@@ -51,7 +56,7 @@ def test_login(email, pwd, vude_id):
                 "x-bc": x_bc,
                 "user-id" : user_id,
                 "sess" : sess,
-                "user-agent" : 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/120.0.6099.28 Safari/537.36',
+                "user-agent" : user_agent,
                 "vude-id": vude_id
             }
             print(clinet_side_values)
