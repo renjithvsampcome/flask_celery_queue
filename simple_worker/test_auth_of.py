@@ -35,7 +35,8 @@ def test_login(email, pwd, vude_id):
                     time.sleep(1)
                     page.fill('input[name="password"]', pwd)
                     page.click('button[type=submit]')
-                    solver.solve_recaptcha(wait=True,image_challenge=True)
+                    token = solver.solve_recaptcha(wait=True,image_challenge=True)
+                    print(token)
                     page.click('button[type=submit]')
                     # page.on("request", request_handler)
             except RecaptchaNotFoundError:
