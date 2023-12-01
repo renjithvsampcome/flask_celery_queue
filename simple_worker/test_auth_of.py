@@ -40,8 +40,9 @@ def test_login(email, pwd, vude_id):
                 time.sleep(2)
                 page.click('button[type=submit]')
                 token = solver.solve_recaptcha(wait=True,image_challenge=True)
+                time.sleep(10)
                 page.click('button[type=submit]')
-                time.sleep(20)
+                
                 # print(page.screenshot())
 
             time.sleep(30)
