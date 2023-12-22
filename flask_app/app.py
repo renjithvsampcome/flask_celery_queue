@@ -281,8 +281,8 @@ def login_onlyfans():
 
 
 @app.route("/get_link_tiktok", methods=["GET"])
-def get_login_link():
-    return create_tiktok_login_link(16)
+def get_login_tiktok():
+    return jsonify({"link": create_tiktok_login_link(16)})
 
 
 @app.route("/get_user_media_tiktok/<username>/<user_id>/<jwt>", methods=["GET"])
