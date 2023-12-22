@@ -9,11 +9,19 @@ from celery.utils.log import get_task_logger
 import googleapiclient.discovery
 import json
 from pytube import YouTube
+import random
+import string
+import urllib.parse
+# from urllib.parse import unquote
 
 load_dotenv()
 logger = get_task_logger(__name__)
 
-simple_app = Celery('simple_worker', broker=os.environ.get('REDIS_URL'), backend=os.environ.get('REDIS_URL'))
+simple_app = Celery(
+    "simple_worker",
+    broker=os.environ.get("REDIS_URL"),
+    backend=os.environ.get("REDIS_URL"),
+)
 
 API_KEY_YOUTUBE = os.environ.get("API_KEY_YOUTUBE")
 client_id_dev = os.environ.get("CLIENT_ID_DEV")
@@ -23,6 +31,14 @@ redirect_uri_dev = os.environ.get("REDIRECT_URI_DEV")
 consumer_key_twitter = os.environ.get("TWITTER_CONSUMER_KEY")
 consumer_secret_twitter = os.environ.get("TWITTER_CONSUMER_SECRET")
 
+# Replace these values with your TikTok application credentials
+CLIENT_KEY_TIKTOK = "awbgusesqrw1zmx0"
+CLIENT_SECRET_TIKTOK = "38dVCpL9SnqxPGtvyrYpuqb7w41EzGJF"
+REDIRECT_URI_TIKTOK = "https://api.vude.com/api/auth/tiktok/import/callback/"
+encoded_redirect_uri_tiktok = urllib.parse.quote(REDIRECT_URI_TIKTOK)
+SCOPE_TIKTOK = "user.info.basic,video.list"
+AUTHORIZATION_URL_TIKTOK = "https://www.tiktok.com/v2/auth/authorize/"
+
 
 def get_status(task_id):
     status = simple_app.AsyncResult(task_id, app=simple_app)
@@ -30,26 +46,28 @@ def get_status(task_id):
 
 
 def get_access_token(code):
-
     # Form data for the POST request
     data = {
-        'client_id': client_id_dev,
-        'client_secret': client_secret_dev,
-        'grant_type': 'authorization_code',
-        'redirect_uri': redirect_uri_dev,
-        'code': code
+        "client_id": client_id_dev,
+        "client_secret": client_secret_dev,
+        "grant_type": "authorization_code",
+        "redirect_uri": redirect_uri_dev,
+        "code": code,
     }
 
     try:
         # Make the POST request to Instagram
-        response = requests.post("https://api.instagram.com/oauth/access_token", data=data)
+        response = requests.post(
+            "https://api.instagram.com/oauth/access_token", data=data
+        )
         return response.json()
-    
-    except Exception as e:
-        return jsonify({'error': str(e)})
 
-def give_file_name(name,type):
-    if type == 'VIDEO':
+    except Exception as e:
+        return jsonify({"error": str(e)})
+
+
+def give_file_name(name, type):
+    if type == "VIDEO":
         file_name = f"video_{name}.mp4"
     elif type == "IMAGE":
         file_name = f"image_{name}.jpg"
@@ -57,32 +75,71 @@ def give_file_name(name,type):
         file_name = f"shorts_{name}.mp4"
     else:
         return None
-    return f'https://vude-bucket.blr1.digitaloceanspaces.com/test-dev/{file_name}'
+    return f"https://vude-bucket.blr1.digitaloceanspaces.com/test-dev/{file_name}"
 
-def handle_api_insta(row,response, token,idd):
+
+def handle_api_insta(row, response, token, idd):
     r = None
-    for data in response['data']:
-        caption = data['caption'] if 'caption' in data else None
-        if data['media_type'] == 'VIDEO' or data['media_type'] == 'IMAGE':
-            file_url = give_file_name(f"{data['id']}{idd}", data['media_type'])
+    for data in response["data"]:
+        caption = data["caption"] if "caption" in data else None
+        if data["media_type"] == "VIDEO" or data["media_type"] == "IMAGE":
+            file_url = give_file_name(f"{data['id']}{idd}", data["media_type"])
             if file_url:
-                r = simple_app.send_task('tasks.handle_file', kwargs={'url': data['media_url'], 'name': f"{data['id']}{idd}", 'type': data['media_type']})
+                r = simple_app.send_task(
+                    "tasks.handle_file",
+                    kwargs={
+                        "url": data["media_url"],
+                        "name": f"{data['id']}{idd}",
+                        "type": data["media_type"],
+                    },
+                )
                 # file_url = handle_file(data['media_url'], data['id'], data['media_type'])
-                row.append((f"{data['id']}{idd}", data["media_type"],file_url ,data["username"],data['timestamp'],False, caption, r.id))
-                
-        elif data['media_type'] == 'CAROUSEL_ALBUM':
+                row.append(
+                    (
+                        f"{data['id']}{idd}",
+                        data["media_type"],
+                        file_url,
+                        data["username"],
+                        data["timestamp"],
+                        False,
+                        caption,
+                        r.id,
+                    )
+                )
+
+        elif data["media_type"] == "CAROUSEL_ALBUM":
             params = {
-                'fields': 'id,media_type,media_url,username,timestamp',
-                'access_token': token['access_token']
+                "fields": "id,media_type,media_url,username,timestamp",
+                "access_token": token["access_token"],
             }
-            res = requests.get(f"https://graph.instagram.com/{data['id']}/children", params=params).json()
-            count=0
-            for d in res['data']:
-                file_url = give_file_name(f"{d['id']}{idd}{count}", d['media_type'])
+            res = requests.get(
+                f"https://graph.instagram.com/{data['id']}/children", params=params
+            ).json()
+            count = 0
+            for d in res["data"]:
+                file_url = give_file_name(f"{d['id']}{idd}{count}", d["media_type"])
                 if file_url:
-                    r = simple_app.send_task('tasks.handle_file', kwargs={'url': d['media_url'], 'name': f"{d['id']}{idd}{count}", 'type': d['media_type']})
-                    row.append((f"{data['id']}{idd}{count}",d["media_type"],file_url ,d["username"],d['timestamp'],True,caption,r.id))  
-                    count+=1
+                    r = simple_app.send_task(
+                        "tasks.handle_file",
+                        kwargs={
+                            "url": d["media_url"],
+                            "name": f"{d['id']}{idd}{count}",
+                            "type": d["media_type"],
+                        },
+                    )
+                    row.append(
+                        (
+                            f"{data['id']}{idd}{count}",
+                            d["media_type"],
+                            file_url,
+                            d["username"],
+                            d["timestamp"],
+                            True,
+                            caption,
+                            r.id,
+                        )
+                    )
+                    count += 1
         else:
             pass
     if r != None:
@@ -91,27 +148,68 @@ def handle_api_insta(row,response, token,idd):
         return None
 
 
-def handle_api_facebook(row,response,idd):
+def handle_api_facebook(row, response, idd):
     r = None
-    for data in response['data']:
-        if data['status_type'] == "added_photos" or data['status_type'] == "added_video":
-            message = data['message'] if 'message' in data else None
-            if data['type'] == 'photo':
-                data['type'] = "IMAGE"
-                file_url = give_file_name(f"{data['id']}{idd}", data['type'])
+    for data in response["data"]:
+        if (
+            data["status_type"] == "added_photos"
+            or data["status_type"] == "added_video"
+        ):
+            message = data["message"] if "message" in data else None
+            if data["type"] == "photo":
+                data["type"] = "IMAGE"
+                file_url = give_file_name(f"{data['id']}{idd}", data["type"])
                 if file_url:
-                    r = simple_app.send_task('tasks.handle_file', kwargs={'url': data['full_picture'], 'name': f"{data['id']}{idd}", 'type': data['type'] })
-                    row.append((f"{data['id']}{idd}", "IMAGE", file_url ,"username",data['created_time'],False, message, r.id))
-                
-            elif data['type'] == "video":
-                data['type'] = 'VIDEO'
-                if 'source' in data['attachments']['data'][0]['media']:
-                    file_url = give_file_name(f"{data['id']}{idd}", data['type'] )
+                    r = simple_app.send_task(
+                        "tasks.handle_file",
+                        kwargs={
+                            "url": data["full_picture"],
+                            "name": f"{data['id']}{idd}",
+                            "type": data["type"],
+                        },
+                    )
+                    row.append(
+                        (
+                            f"{data['id']}{idd}",
+                            "IMAGE",
+                            file_url,
+                            "username",
+                            data["created_time"],
+                            False,
+                            message,
+                            r.id,
+                        )
+                    )
+
+            elif data["type"] == "video":
+                data["type"] = "VIDEO"
+                if "source" in data["attachments"]["data"][0]["media"]:
+                    file_url = give_file_name(f"{data['id']}{idd}", data["type"])
                     if file_url:
-                        r = simple_app.send_task('tasks.handle_file', kwargs={'url': data['attachments']['data'][0]['media']['source'], 'name': f"{data['id']}{idd}", 'type': data['type'] })
-                        row.append((f"{data['id']}{idd}", "VIDEO", file_url ,"username",data['created_time'],False, message, r.id))
-                        
-            else: 
+                        r = simple_app.send_task(
+                            "tasks.handle_file",
+                            kwargs={
+                                "url": data["attachments"]["data"][0]["media"][
+                                    "source"
+                                ],
+                                "name": f"{data['id']}{idd}",
+                                "type": data["type"],
+                            },
+                        )
+                        row.append(
+                            (
+                                f"{data['id']}{idd}",
+                                "VIDEO",
+                                file_url,
+                                "username",
+                                data["created_time"],
+                                False,
+                                message,
+                                r.id,
+                            )
+                        )
+
+            else:
                 pass
         else:
             pass
@@ -120,100 +218,187 @@ def handle_api_facebook(row,response,idd):
     else:
         return None
 
-#twitter
+
+# twitter
+
 
 def get_access_url():
-    try:    
+    try:
         oauth1_user_handler = tweepy.OAuth1UserHandler(
-            consumer_key_twitter, consumer_secret_twitter,
-            callback=os.environ.get("TWITTER_CALLBACK")
+            consumer_key_twitter,
+            consumer_secret_twitter,
+            callback=os.environ.get("TWITTER_CALLBACK"),
         )
-        return jsonify({'result': f"{oauth1_user_handler.get_authorization_url()}",'request_token':f"{oauth1_user_handler.request_token['oauth_token']}",'request_secret':f"{oauth1_user_handler.request_token['oauth_token_secret']}"}) , 200
+        return (
+            jsonify(
+                {
+                    "result": f"{oauth1_user_handler.get_authorization_url()}",
+                    "request_token": f"{oauth1_user_handler.request_token['oauth_token']}",
+                    "request_secret": f"{oauth1_user_handler.request_token['oauth_token_secret']}",
+                }
+            ),
+            200,
+        )
     except Exception as e:
-        return jsonify({'error': f"{e}"}), 400
+        return jsonify({"error": f"{e}"}), 400
 
-def handle_twitter_api(row, ot, ots, verifier,idd):
+
+def handle_twitter_api(row, ot, ots, verifier, idd):
     try:
         new_oauth1_user_handler = tweepy.OAuth1UserHandler(
-            consumer_key_twitter, consumer_secret_twitter,
-            callback=os.environ.get("TWITTER_CALLBACK")
+            consumer_key_twitter,
+            consumer_secret_twitter,
+            callback=os.environ.get("TWITTER_CALLBACK"),
         )
         new_oauth1_user_handler.request_token = {
             "oauth_token": ot,
-            "oauth_token_secret": ots
+            "oauth_token_secret": ots,
         }
-        access_token, access_token_secret = new_oauth1_user_handler.get_access_token(verifier)
-        client = tweepy.Client(consumer_key=consumer_key_twitter,consumer_secret=consumer_secret_twitter,access_token=access_token,access_token_secret=access_token_secret)
+        access_token, access_token_secret = new_oauth1_user_handler.get_access_token(
+            verifier
+        )
+        client = tweepy.Client(
+            consumer_key=consumer_key_twitter,
+            consumer_secret=consumer_secret_twitter,
+            access_token=access_token,
+            access_token_secret=access_token_secret,
+        )
         # client.get_home_timeline()
         user = client.get_me()
 
-        data = client.get_users_tweets(user.data.id,user_auth=True,tweet_fields = ['created_at', 'text', 'id', 'attachments','author_id', 'entities'], media_fields=["url","type","media_key","preview_image_url"], expansions=['attachments.media_keys', 'author_id'])
-        
+        data = client.get_users_tweets(
+            user.data.id,
+            user_auth=True,
+            tweet_fields=[
+                "created_at",
+                "text",
+                "id",
+                "attachments",
+                "author_id",
+                "entities",
+            ],
+            media_fields=["url", "type", "media_key", "preview_image_url"],
+            expansions=["attachments.media_keys", "author_id"],
+        )
+
         r = None
-        for data in data.includes['media']:
-            if data.type == 'photo':
+        for data in data.includes["media"]:
+            if data.type == "photo":
                 data.type = "IMAGE"
                 file_url = give_file_name(f"{data.media_key}{idd}", data.type)
                 if file_url:
-                    r = simple_app.send_task('tasks.handle_file', kwargs={'url': data.url, 'name': f"{data.media_key}{idd}", 'type': data.type })
-                    row.append((f"{data.media_key}{idd}", data.type,file_url,user.data.username, r.id ))
+                    r = simple_app.send_task(
+                        "tasks.handle_file",
+                        kwargs={
+                            "url": data.url,
+                            "name": f"{data.media_key}{idd}",
+                            "type": data.type,
+                        },
+                    )
+                    row.append(
+                        (
+                            f"{data.media_key}{idd}",
+                            data.type,
+                            file_url,
+                            user.data.username,
+                            r.id,
+                        )
+                    )
             elif data.type == "video":
                 data.type = "IMAGE"
                 file_url = give_file_name(f"{data.media_key}{idd}", data.type)
                 if file_url:
-                    r = simple_app.send_task('tasks.handle_file', kwargs={'url': data.preview_image_url, 'name': f"{data.media_key}{idd}", 'type': data.type })
-                    row.append((f"{data.media_key}{idd}", data.type, file_url, user.data.username, r.id))
+                    r = simple_app.send_task(
+                        "tasks.handle_file",
+                        kwargs={
+                            "url": data.preview_image_url,
+                            "name": f"{data.media_key}{idd}",
+                            "type": data.type,
+                        },
+                    )
+                    row.append(
+                        (
+                            f"{data.media_key}{idd}",
+                            data.type,
+                            file_url,
+                            user.data.username,
+                            r.id,
+                        )
+                    )
             else:
                 pass
-        return row , r.id
+        return row, r.id
     except Exception as e:
         logger.info(f"Encounter an exception: {e}")
-        return  [] , None
-        
-    # print(data.includes['media'][0].preview_image_url) 
+        return [], None
+
+    # print(data.includes['media'][0].preview_image_url)
     # print(data.includes['media'][0].ype)
 
 
-
 def get_channel_video(channel_id):
-    youtube = googleapiclient.discovery.build('youtube', 'v3', developerKey=API_KEY_YOUTUBE)
+    youtube = googleapiclient.discovery.build(
+        "youtube", "v3", developerKey=API_KEY_YOUTUBE
+    )
 
     videos = []
-    res = youtube.channels().list(id=channel_id, part='contentDetails').execute()
+    res = youtube.channels().list(id=channel_id, part="contentDetails").execute()
     # print(res)
-    playlist_id =res['items'][0]['contentDetails']['relatedPlaylists']['uploads']
-    
+    playlist_id = res["items"][0]["contentDetails"]["relatedPlaylists"]["uploads"]
+
     next_page_token = None
     while True:
-        result = youtube.playlistItems().list(playlistId=playlist_id, part = 'snippet',maxResults = 50, pageToken = next_page_token).execute()
-        videos += result['items']
+        result = (
+            youtube.playlistItems()
+            .list(
+                playlistId=playlist_id,
+                part="snippet",
+                maxResults=50,
+                pageToken=next_page_token,
+            )
+            .execute()
+        )
+        videos += result["items"]
 
-        if 'nextPageToken' not in result:
+        if "nextPageToken" not in result:
             break
-        next_page_token = res['nextPageToken']
+        next_page_token = res["nextPageToken"]
         if next_page_token is None:
             break
     return videos
 
-def handle_youtube_import(row, channel_id,id):
+
+def handle_youtube_import(row, channel_id, id):
     videos = get_channel_video(channel_id)
     print(videos)
     r = None
     if len(videos) != 0:
         for d in videos:
-            video_id = d['snippet']['resourceId']['videoId']
+            video_id = d["snippet"]["resourceId"]["videoId"]
             video_url = f"https://www.youtube.com/shorts/{video_id}"
             try:
                 yt = YouTube(video_url)
                 if yt.length <= 100:
                     name = f"{video_id}{id}"
-                    file_url = give_file_name(name,'SHORTS')
+                    file_url = give_file_name(name, "SHORTS")
                     if file_url:
-                        r = simple_app.send_task('tasks.handle_youtube_file', kwargs={'url': video_url, 'name': name, 'type': "SHORTS"})
-                        row.append((name, d['snippet']['title'], d['snippet']['publishedAt'], file_url,"VIDEO", r.id))
+                        r = simple_app.send_task(
+                            "tasks.handle_youtube_file",
+                            kwargs={"url": video_url, "name": name, "type": "SHORTS"},
+                        )
+                        row.append(
+                            (
+                                name,
+                                d["snippet"]["title"],
+                                d["snippet"]["publishedAt"],
+                                file_url,
+                                "VIDEO",
+                                r.id,
+                            )
+                        )
             except:
                 pass
-                
+
             # headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36'}
             # response = requests.head(video_url,allow_redirects=True, headers=headers)
             # print(video_url)
@@ -230,11 +415,54 @@ def handle_youtube_import(row, channel_id,id):
             return row, r.id
         else:
             return row, None
-        
+
     else:
         return row, None
 
 
-def scrape_handler_onlyfans(email,password,vude_id):
-    r = simple_app.send_task('tasks.handle_login_onlyfans', kwargs={'userid': vude_id, 'email': email, 'pwd': password})
+def scrape_handler_onlyfans(email, password, vude_id):
+    r = simple_app.send_task(
+        "tasks.handle_login_onlyfans",
+        kwargs={"userid": vude_id, "email": email, "pwd": password},
+    )
     return r.id
+
+
+def create_tiktok_login_link(length):
+    state = "".join(
+        random.choice(string.ascii_letters + string.digits) for _ in range(length)
+    )
+    return f"{AUTHORIZATION_URL_TIKTOK}?client_key={CLIENT_KEY_TIKTOK}&scope={SCOPE_TIKTOK}&response_type=code&redirect_uri={encoded_redirect_uri_tiktok}&state={state}"
+
+
+def get_access_token_tiktok(jwt):
+    headers = {
+    'Content-Type': 'application/x-www-form-urlencoded',
+    'Cache-Control': 'no-cache',
+    }
+    data = {
+    'client_key': CLIENT_KEY_TIKTOK,
+    'client_secret': CLIENT_SECRET_TIKTOK,
+    'code': urllib.parse.unquote(jwt),
+    'grant_type': 'authorization_code',
+    'redirect_uri': REDIRECT_URI_TIKTOK,
+    }
+    res = requests.post('https://open.tiktokapis.com/v2/oauth/token/', headers=headers, data = data,allow_redirects=True).json()
+    return res['access_token']
+
+def handle_tiktok_download(row, username ,data, url):
+    file_name = f"{data['id']}_{username}.mp4"
+    r = simple_app.send_task(
+                            "tasks.handle_tiktok_task",
+                            kwargs={
+                                "url": url,
+                                "file_name": file_name 
+                            },
+                        )
+    
+    file_url = f"https://vude-bucket.blr1.digitaloceanspaces.com/test-dev/{file_name}"
+    row.append((username, file_url, "VIDEO"))
+    return r.id, row
+    
+    
+
