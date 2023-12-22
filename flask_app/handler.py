@@ -34,7 +34,9 @@ consumer_secret_twitter = os.environ.get("TWITTER_CONSUMER_SECRET")
 # Replace these values with your TikTok application credentials
 CLIENT_KEY_TIKTOK = os.environ.get("CLIENT_KEY_TIKTOK")
 CLIENT_SECRET_TIKTOK = os.environ.get("CLIENT_SECRET_TIKTOK")
-encoded_redirect_uri_tiktok = quote(os.environ.get("REDIRECT_URI_TIKTOK"))
+REDIRECT_URI_TIKTOK=os.environ.get("REDIRECT_URI_TIKTOK")
+print(REDIRECT_URI_TIKTOK)
+encoded_redirect_uri_tiktok = quote(str(REDIRECT_URI_TIKTOK))
 SCOPE_TIKTOK = os.environ.get("SCOPE_TIKTOK")
 AUTHORIZATION_URL_TIKTOK = os.environ.get("AUTHORIZATION_URL_TIKTOK")
 
