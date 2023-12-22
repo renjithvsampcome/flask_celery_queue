@@ -280,7 +280,7 @@ def login_onlyfans():
     return jsonify({"status": "Pending", "last_job_id": rid}), 200
 
 
-@app.route("/get_link_tiktok", method=["GET"])
+@app.route("/get_link_tiktok", methods=["GET"])
 def get_login_link():
     return create_tiktok_login_link(16)
 
