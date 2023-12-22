@@ -12,6 +12,7 @@ from pytube import YouTube
 import random
 import string
 import urllib
+from urllib.parse import quote
 
 load_dotenv()
 logger = get_task_logger(__name__)
@@ -33,8 +34,7 @@ consumer_secret_twitter = os.environ.get("TWITTER_CONSUMER_SECRET")
 # Replace these values with your TikTok application credentials
 CLIENT_KEY_TIKTOK = os.environ.get("CLIENT_KEY_TIKTOK")
 CLIENT_SECRET_TIKTOK = os.environ.get("CLIENT_SECRET_TIKTOK")
-REDIRECT_URI_TIKTOK = os.environ.get("REDIRECT_URI_TIKTOK")
-encoded_redirect_uri_tiktok = urllib.parse.quote(REDIRECT_URI_TIKTOK)
+encoded_redirect_uri_tiktok = quote(os.environ.get("REDIRECT_URI_TIKTOK"))
 SCOPE_TIKTOK = os.environ.get("SCOPE_TIKTOK")
 AUTHORIZATION_URL_TIKTOK = os.environ.get("AUTHORIZATION_URL_TIKTOK")
 
