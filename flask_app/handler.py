@@ -11,8 +11,7 @@ import json
 from pytube import YouTube
 import random
 import string
-import urllib
-from urllib.parse import quote
+from urllib.parse import quote, unquote
 
 load_dotenv()
 logger = get_task_logger(__name__)
@@ -444,7 +443,7 @@ def get_access_token_tiktok(jwt):
     data = {
     'client_key': CLIENT_KEY_TIKTOK,
     'client_secret': CLIENT_SECRET_TIKTOK,
-    'code': urllib.parse.unquote(jwt),
+    'code': unquote(jwt),
     'grant_type': 'authorization_code',
     'redirect_uri': REDIRECT_URI_TIKTOK,
     }
@@ -462,7 +461,7 @@ def handle_tiktok_download(row, username ,data, url):
                         )
     
     file_url = f"https://vude-bucket.blr1.digitaloceanspaces.com/test-dev/{file_name}"
-    row.append((username, file_url, "VIDEO"))
+    row.append((data['id'],username, file_url, "VIDEO", r.id))
     return r.id, row
     
     

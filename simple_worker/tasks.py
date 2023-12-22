@@ -6,7 +6,7 @@ import os
 from celery import Celery
 from celery.utils.log import get_task_logger
 from pytube import YouTube
-from pytube.exceptions import VideoUnavailable
+# from pytube.exceptions import VideoUnavailable
 import psycopg2
 import shutil
 from test_auth_of import test_login
@@ -145,6 +145,8 @@ def handle_login_onlyfans(userid, email, pwd):
 @app.task()
 def handle_tiktok_task(url, file_name):
     try:
+        db_conn = get_db_connection()
+        cursor = db_conn.cursor()
         headers = {
             'authority': 'www.tiktok.com',
             'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
@@ -195,6 +197,13 @@ def handle_tiktok_task(url, file_name):
         s3.upload_file(file_name, bucket_name, file_name)
         s3.put_object_acl(ACL="public-read", Bucket=bucket_name, Key=file_name)
         os.remove(file_name)
+        job_id = handle_tiktok_task.request.id
+        update_query = (
+            "INSERT INTO public.import_job_status (job_id, status) VALUES (%s, %s)"
+        )
+        cursor.execute(update_query, (job_id, "SUCCESS"))
+        cursor.close()
+        db_conn.commit()
         logger.info("File saved successfully.")
         return None  
     except:

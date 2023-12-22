@@ -285,14 +285,16 @@ def get_login_tiktok():
     return jsonify({"link": create_tiktok_login_link(16)})
 
 
-@app.route("/get_user_media_tiktok/<username>/<user_id>/<jwt>", methods=["GET"])
-def import_tiktok(username,user_id, jwt):
+@app.route("/get_user_media_tiktok/<user_id>/<jwt>", methods=["GET"])
+def import_tiktok(user_id, jwt):
     try:
         token = get_access_token_tiktok(jwt)
         headers = {
         'Authorization': f"Bearer {token}",
         'Content-Type': 'application/json',
         }
+        res = requests.get(url="https://open.tiktokapis.com/v2/user/info/?fields=username", headers=headers,allow_redirects=True).json()
+        username = res['data']['user']['username']
         tk_data = {
         'max_count': 20
         }
@@ -302,21 +304,23 @@ def import_tiktok(username,user_id, jwt):
             response = requests.post(url="https://open.tiktokapis.com/v2/video/list/?fields=id,title,video_description,duration,cover_image_url,embed_link", headers= headers, json=tk_data, allow_redirects=True).json()
             tk_data['cursor'] = int(response['data']['cursor'])
             for data in response['data']['videos']:
-                video_url = f"https://www.tiktok.com/{username}/video/{data['id']}"
-                r_id, result  =  handle_tiktok_download(row,username,data, video_url)
+                video_url = f"https://www.tiktok.com/@{username}/video/{data['id']}"
+                r_id, row  =  handle_tiktok_download(row,username,data, video_url)
             if not response['data']['has_more']:
                 break;
-        # df = pd.DataFrame(
-        #         row,
-        #         columns=[
-        #             "file_id",
-        #             "title",
-        #             "published_time",
-        #             "media_url",
-        #             "media_type",
-        #             "job_id",
-        #         ],
-        #     )
+        
+        df = pd.DataFrame(
+            row,
+            columns=['file_id', 'username','media_url','media_type','job_id']
+        )
+        pg.upsert(
+                con=engine,
+                df=df.set_index("file_id"),
+                table_name="import_tiktok",
+                if_row_exists="update",
+                schema="public",
+                chunksize=10000,
+            )
         return jsonify({"status": "Pending", "last_job_id": r_id}), 200
     except Exception as e:
         return (
