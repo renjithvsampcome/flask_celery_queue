@@ -285,7 +285,7 @@ def get_login_link():
     return create_tiktok_login_link(lenght=16)
 
 
-@app.route("/get_user_media_tiktok/<username>/<jwt>", methods=["GET"])
+@app.route("/get_user_media_tiktok/<username>/<user_id>/<jwt>", methods=["GET"])
 def import_tiktok(username,user_id, jwt):
     try:
         token = get_access_token_tiktok(jwt)
