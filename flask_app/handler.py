@@ -32,12 +32,12 @@ consumer_key_twitter = os.environ.get("TWITTER_CONSUMER_KEY")
 consumer_secret_twitter = os.environ.get("TWITTER_CONSUMER_SECRET")
 
 # Replace these values with your TikTok application credentials
-CLIENT_KEY_TIKTOK = "awbgusesqrw1zmx0"
-CLIENT_SECRET_TIKTOK = "38dVCpL9SnqxPGtvyrYpuqb7w41EzGJF"
-REDIRECT_URI_TIKTOK = "https://api.vude.com/api/auth/tiktok/import/callback/"
+CLIENT_KEY_TIKTOK = os.environ.get("CLIENT_KEY_TIKTOK")
+CLIENT_SECRET_TIKTOK = os.environ.get("CLIENT_SECRET_TIKTOK")
+REDIRECT_URI_TIKTOK = os.environ.get("REDIRECT_URI_TIKTOK")
 encoded_redirect_uri_tiktok = urllib.parse.quote(REDIRECT_URI_TIKTOK)
-SCOPE_TIKTOK = "user.info.basic,video.list"
-AUTHORIZATION_URL_TIKTOK = "https://www.tiktok.com/v2/auth/authorize/"
+SCOPE_TIKTOK = os.environ.get("SCOPE_TIKTOK")
+AUTHORIZATION_URL_TIKTOK = os.environ.get("AUTHORIZATION_URL_TIKTOK")
 
 
 def get_status(task_id):

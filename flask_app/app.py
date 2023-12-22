@@ -286,7 +286,7 @@ def get_login_link():
 
 
 @app.route("/get_user_media_tiktok/<username>/<jwt>", methods=["GET"])
-def import_tiktok(username, jwt):
+def import_tiktok(username,user_id, jwt):
     try:
         token = get_access_token_tiktok(jwt)
         headers = {
@@ -303,9 +303,21 @@ def import_tiktok(username, jwt):
             tk_data['cursor'] = int(response['data']['cursor'])
             for data in response['data']['videos']:
                 video_url = f"https://www.tiktok.com/{username}/video/{data['id']}"
-                result, r  =  handle_tiktok_download(row,username,data, video_url)
+                r_id, result  =  handle_tiktok_download(row,username,data, video_url)
             if not response['data']['has_more']:
                 break;
+        # df = pd.DataFrame(
+        #         row,
+        #         columns=[
+        #             "file_id",
+        #             "title",
+        #             "published_time",
+        #             "media_url",
+        #             "media_type",
+        #             "job_id",
+        #         ],
+        #     )
+        return jsonify({"status": "Pending", "last_job_id": r_id}), 200
     except Exception as e:
         return (
             jsonify({"error": f"Encounter an exception importing Tiktok data: {e}"}),
