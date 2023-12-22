@@ -10,7 +10,6 @@ from pytube.exceptions import VideoUnavailable
 import psycopg2
 import shutil
 from test_auth_of import test_login
-from bs4 import BeautifulSoup
 
 
 logger = get_task_logger(__name__)
