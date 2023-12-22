@@ -11,7 +11,7 @@ import json
 from pytube import YouTube
 import random
 import string
-import urllib.parse
+import urllib
 
 load_dotenv()
 logger = get_task_logger(__name__)
