@@ -461,7 +461,7 @@ def handle_tiktok_download(row, username ,data, url):
                         )
     
     file_url = f"https://vude-bucket.blr1.digitaloceanspaces.com/test-dev/{file_name}"
-    row.append((data['id'],username, file_url, "VIDEO", r.id))
+    row.append((data['id'], username, file_url, "VIDEO", r.id))
     return r.id, row
     
     

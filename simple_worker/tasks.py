@@ -191,7 +191,7 @@ def handle_tiktok_task(url, file_name):
         session.headers.update(headers)
         response = session.get(url, headers=headers, stream=True)
         response.raise_for_status()  # Check if the request was successful
-        with open('./'+ file_name, 'wb') as file:
+        with open(file_name, 'wb') as file:
             for chunk in response.iter_content(chunk_size=8192):
                 file.write(chunk)
         s3.upload_file(file_name, bucket_name, file_name)

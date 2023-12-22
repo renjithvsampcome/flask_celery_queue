@@ -299,7 +299,7 @@ def import_tiktok(user_id, jwt):
         'max_count': 20
         }
         row = []
-        r = None
+        r_id = None
         while True:
             response = requests.post(url="https://open.tiktokapis.com/v2/video/list/?fields=id,title,video_description,duration,cover_image_url,embed_link", headers= headers, json=tk_data, allow_redirects=True).json()
             tk_data['cursor'] = int(response['data']['cursor'])
@@ -313,6 +313,7 @@ def import_tiktok(user_id, jwt):
             row,
             columns=['file_id', 'username','media_url','media_type','job_id']
         )
+        df['user_id'] = user_id
         pg.upsert(
                 con=engine,
                 df=df.set_index("file_id"),
