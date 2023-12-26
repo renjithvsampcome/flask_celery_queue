@@ -451,7 +451,7 @@ def get_access_token_tiktok(jwt):
     return res['access_token']
 
 def handle_tiktok_download(row, username ,data, url):
-    file_name = f"{data['id']}_{username}.mp4"
+    file_name = f"{username}_{data['id']}.mp4"
     r = simple_app.send_task(
                             "tasks.handle_tiktok_task",
                             kwargs={
