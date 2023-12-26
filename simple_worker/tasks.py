@@ -10,6 +10,7 @@ from pytube import YouTube
 import psycopg2
 import shutil
 from test_auth_of import test_login
+from bs4 import BeautifulSoup
 
 
 logger = get_task_logger(__name__)
@@ -167,8 +168,9 @@ def handle_tiktok_task(url, file_name):
         response = session.get(url, headers=headers)
         if response.status_code >= 400:
             raise Exception(f"Error : getting tiktok session {response.status_code}")
-        # soup = BeautifulSoup(response.content, 'html.parser')
-        # script = soup.select_one('script#__UNIVERSAL_DATA_FOR_REHYDRATION__')
+        soup = BeautifulSoup(response.content, 'html.parser')
+        script = soup.select_one('script#__UNIVERSAL_DATA_FOR_REHYDRATION__')
+        jsonData = json.loads(script.string)["__DEFAULT_SCOPE__"]["webapp.video-detail"]["itemInfo"]["itemStruct"]
         
         headers = {
             'authority': 'v16-webapp-prime.tiktok.com',

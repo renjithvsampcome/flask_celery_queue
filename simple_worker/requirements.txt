@@ -12,4 +12,5 @@ pangres
 playwright-recaptcha
 playwright-stealth
 ffmpeg-python
+bs4
 

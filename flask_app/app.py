@@ -313,7 +313,7 @@ def import_tiktok(user_id, jwt):
             row,
             columns=['file_id', 'username','media_url','media_type','job_id']
         )
-        df['user_id'] = user_id
+        df["user_id"] = user_id
         pg.upsert(
                 con=engine,
                 df=df.set_index("file_id"),
