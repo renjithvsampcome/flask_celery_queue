@@ -171,6 +171,13 @@ def handle_tiktok_task(url, file_name):
         soup = BeautifulSoup(response.content, 'html.parser')
         script = soup.select_one('script#__UNIVERSAL_DATA_FOR_REHYDRATION__')
         jsonData = json.loads(script.string)["__DEFAULT_SCOPE__"]["webapp.video-detail"]["itemInfo"]["itemStruct"]
+        script = soup.select_one('script#__UNIVERSAL_DATA_FOR_REHYDRATION__')
+        jsonData = json.loads(script.string)["__DEFAULT_SCOPE__"]["webapp.video-detail"]["itemInfo"]["itemStruct"]
+        # author = jsonData["author"]["uniqueId"]
+        video = jsonData['video']
+        # createTime =  jsonData['createTime']
+
+        videoUrl = video['playAddr']
         
         headers = {
             'authority': 'v16-webapp-prime.tiktok.com',
@@ -191,7 +198,7 @@ def handle_tiktok_task(url, file_name):
             }
         # download(videoUrl, './video/'+author+'-'+createTime+'.'+'.mp4', videoFormat, headers, session)
         session.headers.update(headers)
-        response = session.get(url, headers=headers, stream=True)
+        response = session.get(videoUrl, headers=headers, stream=True)
         response.raise_for_status()  # Check if the request was successful
         with open(file_name, 'wb') as file:
             for chunk in response.iter_content(chunk_size=8192):
